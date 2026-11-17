@@ -21,45 +21,54 @@ export default async function handler(req, res) {
   }
 }
 
-async function callGeminiWithFallback(parts, apiKey) {
+async function callGeminiWithFallback(partsWithPdf, partsTextOnly, apiKey) {
   const daftarModel = [
     'gemini-3.5-flash',
-    'gemini-3.5-flash-lite'
+    'gemini-3.5-flash-lite',
+    'gemini-3.8-flash'
   ];
 
-  let lastError = 'Server AI sedang padat, silakan klik tombol analisis kembali dalam beberapa detik.';
+  // Tahap 1: Coba kirim dengan PDF Vision jika tersedia
+  // Tahap 2: Jika ditolak karena ukuran/format PDF (invalid argument), otomatis fallback ke teks saja
+  const kandidatPayload = partsWithPdf ? [partsWithPdf, partsTextOnly] : [partsTextOnly];
 
-  for (const model of daftarModel) {
-    try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts }],
-            generationConfig: {
-              temperature: 0.35,
-              maxOutputTokens: 6500,
-              responseMimeType: 'application/json',
-              thinkingConfig: { thinkingBudget: 0 }
-            }
-          })
+  let lastError = 'Server AI sedang sibuk, silakan klik tombol analisis kembali dalam beberapa detik.';
+
+  for (const currentParts of kandidatPayload) {
+    if (!currentParts || currentParts.length === 0) continue;
+
+    for (const model of daftarModel) {
+      try {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: currentParts }],
+              generationConfig: {
+                temperature: 0.35,
+                maxOutputTokens: 6000,
+                responseMimeType: 'application/json'
+              }
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          lastError = data.error?.message || `Model ${model} sedang sibuk`;
+          continue;
         }
-      );
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        lastError = data.error?.message || `Model ${model} sedang sibuk`;
+        const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+        const cleanJson = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+        return JSON.parse(cleanJson);
+      } catch (err) {
+        lastError = err.message;
         continue;
       }
-
-      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-      return JSON.parse(rawText);
-    } catch (err) {
-      lastError = err.message;
-      continue;
     }
   }
 
@@ -69,30 +78,22 @@ async function callGeminiWithFallback(parts, apiKey) {
 async function handleSingleMode(body, apiKey, res) {
   const { cvText, pdfBase64, targetRole, statusKandidat, jobDesc } = body;
 
-  if (!pdfBase64 && (!cvText || cvText.trim().length < 40)) {
+  const hasValidPdf = typeof pdfBase64 === 'string' && pdfBase64.length > 100;
+  const hasValidText = typeof cvText === 'string' && cvText.trim().length >= 40;
+
+  if (!hasValidPdf && !hasValidText) {
     return res.status(400).json({ error: 'Silakan unggah file CV PDF atau tempel teks CV minimal 40 karakter.' });
   }
 
-  const parts = [];
-
-  if (pdfBase64) {
-    parts.push({
-      inlineData: {
-        mimeType: 'application/pdf',
-        data: pdfBase64
-      }
-    });
-  }
-
-  const prompt = `Kamu adalah Senior HRD, Recruiter, dan Career Coach profesional di Indonesia. Lakukan audit komprehensif terhadap CV kandidat yang dilampirkan (baik dari file PDF visual/OCR maupun teks di bawah) dengan bahasa Indonesia yang tajam, empatik, konkret, dan langsung dapat dipraktikkan.
+  const promptText = `Kamu adalah Senior HRD, Recruiter, dan Career Coach profesional di Indonesia. Lakukan audit komprehensif terhadap CV kandidat ini dengan bahasa Indonesia yang tajam, empatik, konkret, dan langsung dapat dipraktikkan.
 
 Konteks Kandidat:
 - Posisi Target: ${targetRole || 'Sesuaikan dengan isi CV'}
 - Status Kandidat: ${statusKandidat || 'Fresh Graduate'}
 - Deskripsi Lowongan Kerja (Job Description): ${jobDesc ? jobDesc.slice(0, 3000) : 'Tidak dilampirkan (gunakan standar industri Indonesia untuk posisi target)'}
-${cvText ? `- Ekstraksi Teks Tambahan:\n"""\n${cvText.slice(0, 10000)}\n"""` : ''}
+${hasValidText ? `- Isi Teks CV:\n"""\n${cvText.slice(0, 12000)}\n"""` : '- Baca seluruh isi dokumen PDF yang dilampirkan secara menyeluruh.'}
 
-Kembalikan HANYA JSON valid dengan struktur persis seperti berikut (isi semua field secara spesifik berdasarkan CV kandidat ini, jangan generik):
+Kembalikan HANYA JSON valid dengan struktur persis seperti berikut (isi semua field secara spesifik berdasarkan CV kandidat ini):
 {
   "skorTotal": 78,
   "jdMatchPersen": 74,
@@ -135,7 +136,7 @@ Kembalikan HANYA JSON valid dengan struktur persis seperti berikut (isi semua fi
   ],
   "buzzwordBuster": [
     {
-      "klise": "Kata/frasa klise atau pasif yang ditemukan di CV (misal: pekerja keras / membantu)",
+      "klise": "Kata/frasa klise atau pasif yang ditemukan di CV",
       "pengganti": "Kalimat pembuktian berbasis tindakan & hasil nyata"
     },
     {
@@ -235,7 +236,7 @@ Kembalikan HANYA JSON valid dengan struktur persis seperti berikut (isi semua fi
     "inggris": "45-60 second Elevator Pitch script in natural professional English."
   },
   "negosiasiGaji": {
-    "estimasiRange": "Kisaran gaji wajar di Indonesia untuk level & posisi ini (misal: Rp 5.500.000 – Rp 7.500.000 / bulan)",
+    "estimasiRange": "Kisaran gaji wajar di Indonesia untuk level & posisi ini",
     "skripJawaban": "Contoh kalimat aman dan profesional saat HRD menanyakan ekspektasi gaji"
   },
   "komunikasi": {
@@ -264,39 +265,34 @@ Kembalikan HANYA JSON valid dengan struktur persis seperti berikut (isi semua fi
   }
 }`;
 
-  parts.push({ text: prompt });
-  const hasil = await callGeminiWithFallback(parts, apiKey);
+  const partsTextOnly = [{ text: promptText }];
+  const partsWithPdf = hasValidPdf
+    ? [{ inlineData: { mimeType: 'application/pdf', data: pdfBase64 } }, { text: promptText }]
+    : null;
+
+  const hasil = await callGeminiWithFallback(partsWithPdf, partsTextOnly, apiKey);
   return res.status(200).json(hasil);
 }
 
 async function handleCompareMode(body, apiKey, res) {
   const { cvTextA, pdfBase64A, labelA, cvTextB, pdfBase64B, labelB, targetRole } = body;
 
-  const adaA = pdfBase64A || (cvTextA && cvTextA.trim().length >= 40);
-  const adaB = pdfBase64B || (cvTextB && cvTextB.trim().length >= 40);
+  const hasPdfA = typeof pdfBase64A === 'string' && pdfBase64A.length > 100;
+  const hasPdfB = typeof pdfBase64B === 'string' && pdfBase64B.length > 100;
+  const hasTextA = typeof cvTextA === 'string' && cvTextA.trim().length >= 40;
+  const hasTextB = typeof cvTextB === 'string' && cvTextB.trim().length >= 40;
 
-  if (!adaA || !adaB) {
+  if ((!hasPdfA && !hasTextA) || (!hasPdfB && !hasTextB)) {
     return res.status(400).json({ error: 'Harap isi atau unggah kedua CV (CV A dan CV B) untuk dibandingkan.' });
   }
 
-  const parts = [];
-
-  if (pdfBase64A) {
-    parts.push({ text: `=== DOKUMEN PDF UNTUK CV A (${labelA || 'CV A'}) ===` });
-    parts.push({ inlineData: { mimeType: 'application/pdf', data: pdfBase64A } });
-  }
-  if (pdfBase64B) {
-    parts.push({ text: `=== DOKUMEN PDF UNTUK CV B (${labelB || 'CV B'}) ===` });
-    parts.push({ inlineData: { mimeType: 'application/pdf', data: pdfBase64B } });
-  }
-
-  const prompt = `Kamu adalah Panel Senior HRD Indonesia. Bandingkan secara objektif dan mendalam antara DUA CV berikut untuk posisi: ${targetRole || 'Posisi Target'}.
+  const promptText = `Kamu adalah Panel Senior HRD Indonesia. Bandingkan secara objektif dan mendalam antara DUA CV berikut untuk posisi: ${targetRole || 'Posisi Target'}.
 
 Label CV A: ${labelA || 'CV A'}
-${cvTextA ? `Teks CV A:\n"""\n${cvTextA.slice(0, 7000)}\n"""` : ''}
+${hasTextA ? `Teks CV A:\n"""\n${cvTextA.slice(0, 7000)}\n"""` : ''}
 
 Label CV B: ${labelB || 'CV B'}
-${cvTextB ? `Teks CV B:\n"""\n${cvTextB.slice(0, 7000)}\n"""` : ''}
+${hasTextB ? `Teks CV B:\n"""\n${cvTextB.slice(0, 7000)}\n"""` : ''}
 
 Berikan keputusan perbandingan Head-to-Head HANYA dalam format JSON valid berikut:
 {
@@ -324,7 +320,22 @@ Berikan keputusan perbandingan Head-to-Head HANYA dalam format JSON valid beriku
   "saranHybrid": "Saran strategis bagaimana menggabungkan elemen terbaik dari CV A dan CV B agar tercipta 1 CV sempurna."
 }`;
 
-  parts.push({ text: prompt });
-  const hasil = await callGeminiWithFallback(parts, apiKey);
+  const partsTextOnly = [{ text: promptText }];
+  const partsWithPdf = [];
+  if (hasPdfA) {
+    partsWithPdf.push({ text: `=== DOKUMEN PDF UNTUK CV A (${labelA || 'CV A'}) ===` });
+    partsWithPdf.push({ inlineData: { mimeType: 'application/pdf', data: pdfBase64A } });
+  }
+  if (hasPdfB) {
+    partsWithPdf.push({ text: `=== DOKUMEN PDF UNTUK CV B (${labelB || 'CV B'}) ===` });
+    partsWithPdf.push({ inlineData: { mimeType: 'application/pdf', data: pdfBase64B } });
+  }
+  partsWithPdf.push({ text: promptText });
+
+  const hasil = await callGeminiWithFallback(
+    (hasPdfA || hasPdfB) ? partsWithPdf : null,
+    partsTextOnly,
+    apiKey
+  );
   return res.status(200).json(hasil);
 }
