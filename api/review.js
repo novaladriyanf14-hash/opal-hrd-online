@@ -42,8 +42,8 @@ Berikan output HANYA dalam format JSON valid (tanpa markdown \`\`\`json) dengan 
   // Daftar model berurutan: jika model pertama padat, otomatis pindah ke cadangan
   const daftarModel = [
     'gemini-3.8-flash',
-    'gemini-3.8-flash-lite',
-    'gemini-2.5-flash-lite'
+    'gemini-3.5-flash',
+    'gemini-3.5-flash-lite'
   ];
 
   let lastError = 'Server AI sedang sibuk, silakan coba beberapa saat lagi.';
