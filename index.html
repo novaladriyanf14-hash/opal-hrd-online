@@ -322,9 +322,9 @@
 
 <main class="container">
   <section class="hero">
-    <div class="hero-tag">Instant OCR Vision PDF · 21 Fitur Audit HRD · 100% Gratis</div>
+    <div class="hero-tag">Smart OCR PDF · 21 Fitur Audit HRD · 100% Gratis</div>
     <h1>Bedah CV Kamu dari <em>Mata HRD</em><br>Hingga Siap Lolos Interview.</h1>
-    <p>Membaca CV desain Canva, 2 kolom, hingga hasil scan secara instan dan tajam. Dilengkapi 20 indikator audit karier & pembanding 2 CV sekaligus.</p>
+    <p>Mendukung pembacaan teks & OCR PDF Canva/scan secara cerdas, dilengkapi 20 indikator audit karier & fitur pembanding 2 CV sekaligus.</p>
   </section>
 
   <div class="mode-switch">
@@ -355,17 +355,17 @@
       <textarea id="jobDesc" rows="2" placeholder="Tempel kualifikasi lowongan kerja di sini agar AI menghitung % kecocokan spesifik..."></textarea>
     </div>
 
-    <label>Unggah File CV (.PDF — OCR Vision Canva/Scan) atau Tempel Teks</label>
+    <label>Unggah File CV (.PDF) atau Tempel Teks CV</label>
     <div class="upload-box" onclick="document.getElementById('pdfSingle').click()">
       <strong style="font-family: var(--font-head); font-size: 0.92rem;">📄 Klik untuk Pilih File CV (.PDF)</strong>
-      <div id="fileNameSingle" style="font-size: 0.78rem; color: var(--muted); margin-top: 4px;">Otomatis merender gambar OCR resolusi tinggi & mengekstrak teks</div>
+      <div id="fileNameSingle" style="font-size: 0.78rem; color: var(--muted); margin-top: 4px;">Otomatis mengekstrak teks & mengaktifkan OCR visual bila diperlukan</div>
       <input type="file" id="pdfSingle" accept=".pdf" style="display:none">
     </div>
 
     <textarea id="cvTextSingle" rows="4" placeholder="Atau tempel teks CV kamu di sini..."></textarea>
 
     <button id="btnRunSingle" class="btn-primary" style="margin-top: 16px;" onclick="runSingleAudit()">
-      Analisa CV Sekarang (Cepat ±3 Detik)
+      Analisa CV Sekarang (±2 Detik)
     </button>
     <div id="errSingle" class="error-msg"></div>
   </section>
@@ -498,7 +498,7 @@
       </div>
     </div>
 
-    <!-- TAB 3 (ON-DEMAND LOAD) -->
+    <!-- TAB 3 -->
     <div id="tab3" class="tab-pane">
       <div id="tab3Loader" class="card loading-tab">⏳ Menyiapkan Simulasi Pertanyaan Interview, Elevator Pitch & Estimasi Gaji (±2 detik)...</div>
       <div id="tab3Content" style="display:none;">
@@ -539,7 +539,7 @@
       </div>
     </div>
 
-    <!-- TAB 4 (ON-DEMAND LOAD) -->
+    <!-- TAB 4 -->
     <div id="tab4" class="tab-pane">
       <div id="tab4Loader" class="card loading-tab">⏳ Menyusun Email Lamaran, Optimasi LinkedIn & Action Plan 7 Hari (±2 detik)...</div>
       <div id="tab4Content" style="display:none;">
@@ -663,7 +663,7 @@
     });
   }
 
-  // TEROBOSAN 1: CLIENT-SIDE CANVAS SNAPSHOT (OCR VISION INSTAN ±150KB)
+  // SMART PDF EXTRACTOR: Kirim gambar OCR hanya jika teks PDF kosong/sedikit (hemat kuota & super cepat)
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
   function setupPdfSnapshot(inputId, labelId, textareaId, storeKey) {
@@ -672,37 +672,42 @@
       if (!file) return;
 
       const labelEl = document.getElementById(labelId);
-      labelEl.textContent = '⏳ Merender gambar OCR tajam: ' + file.name + '...';
+      labelEl.textContent = '⏳ Membaca dokumen PDF: ' + file.name + '...';
 
       try {
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
         let fullText = '';
-        const snapshots = [];
 
-        const maxPages = Math.min(pdf.numPages, 2);
-        for (let i = 1; i <= maxPages; i++) {
+        for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const content = await page.getTextContent();
           fullText += content.items.map(item => item.str).join(' ') + '\n';
-
-          // Render halaman PDF ke Canvas JPEG ringan untuk OCR Vision Gemini
-          const viewport = page.getViewport({ scale: 1.5 });
-          const canvas = document.createElement('canvas');
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
-          const ctx = canvas.getContext('2d');
-          await page.render({ canvasContext: ctx, viewport }).promise;
-
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.78);
-          snapshots.push(dataUrl.split(',')[1]);
         }
 
-        imageStore[storeKey] = snapshots;
-        if (fullText.trim()) {
-          document.getElementById(textareaId).value = fullText.trim();
+        const cleanText = fullText.trim();
+        document.getElementById(textareaId).value = cleanText;
+
+        // Jika teks PDF kurang dari 150 karakter (misal PDF hasil scan/gambar Canva), render JPEG OCR
+        if (cleanText.length < 150) {
+          const snapshots = [];
+          const maxPages = Math.min(pdf.numPages, 2);
+          for (let i = 1; i <= maxPages; i++) {
+            const page = await pdf.getPage(i);
+            const viewport = page.getViewport({ scale: 1.4 });
+            const canvas = document.createElement('canvas');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            const ctx = canvas.getContext('2d');
+            await page.render({ canvasContext: ctx, viewport }).promise;
+            snapshots.push(canvas.toDataURL('image/jpeg', 0.75).split(',')[1]);
+          }
+          imageStore[storeKey] = snapshots;
+          labelEl.textContent = `✅ Mode OCR Gambar Aktif (${snapshots.length} hal): ${file.name}`;
+        } else {
+          imageStore[storeKey] = [];
+          labelEl.textContent = `✅ Teks PDF Terbaca Sempurna: ${file.name}`;
         }
-        labelEl.textContent = `✅ OCR Visual Siap (${snapshots.length} halaman): ${file.name}`;
       } catch (err) {
         labelEl.textContent = '❌ Gagal membaca PDF, silakan tempel teks CV manual.';
       }
@@ -713,7 +718,6 @@
   setupPdfSnapshot('pdfA', 'fileNameA', 'cvTextA', 'A');
   setupPdfSnapshot('pdfB', 'fileNameB', 'cvTextB', 'B');
 
-  // Safe JSON Fetcher (Anti Unexpected token 'A')
   async function postJsonSafe(payload) {
     const res = await fetch('/api/review', {
       method: 'POST',
@@ -731,7 +735,6 @@
     return parsed;
   }
 
-  // TAHAP 1: ANALISIS INTI (TAB 1 & TAB 2)
   async function runSingleAudit() {
     const cvText = document.getElementById('cvTextSingle').value.trim();
     const images = imageStore.single;
@@ -756,7 +759,7 @@
     document.getElementById('tab4Content').style.display = 'none';
 
     btn.disabled = true;
-    btn.textContent = '⚡ Memindai OCR & Mengaudit CV (±3 detik)...';
+    btn.textContent = '⚡ Mengaudit CV (±2 detik)...';
 
     try {
       const d = await postJsonSafe({ mode: 'core', cvText, images, targetRole, statusKandidat, jobDesc });
@@ -836,11 +839,10 @@
       errBox.style.display = 'block';
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Analisa CV Sekarang (Cepat ±3 Detik)';
+      btn.textContent = 'Analisa CV Sekarang (±2 Detik)';
     }
   }
 
-  // TEROBOSAN 2: ON-DEMAND TAB LOADING SAAT TAB 3 ATAU TAB 4 DIKLIK
   async function openTab(tabId) {
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -934,7 +936,6 @@
     }
   }
 
-  // MODE 2: COMPARE 2 CVS
   async function runCompareAudit() {
     const targetRole = document.getElementById('compareRole').value.trim();
     const labelA = document.getElementById('labelA').value.trim() || 'CV A';
@@ -954,7 +955,7 @@
     }
 
     btn.disabled = true;
-    btn.textContent = '⚖️ Membandingkan CV A vs CV B (±3 detik)...';
+    btn.textContent = '⚖️ Membandingkan CV A vs CV B (±2 detik)...';
 
     try {
       const d = await postJsonSafe({ mode: 'compare', targetRole, labelA, cvTextA, imagesA, labelB, cvTextB, imagesB });
