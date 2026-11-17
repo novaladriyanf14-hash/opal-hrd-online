@@ -39,33 +39,48 @@ Berikan output HANYA dalam format JSON valid (tanpa markdown \`\`\`json) dengan 
   "sesudahRewrite": "Tulis ulang kalimat tersebut agar berorientasi dampak, angka, dan ramah ATS."
 }`;
 
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.4,
-            responseMimeType: 'application/json'
-          }
-        })
+  // Daftar model berurutan: jika model pertama padat, otomatis pindah ke cadangan
+  const daftarModel = [
+    'gemini-3.8-flash',
+    'gemini-3.8-flash-lite',
+    'gemini-2.5-flash-lite'
+  ];
+
+  let lastError = 'Server AI sedang sibuk, silakan coba beberapa saat lagi.';
+
+  for (const model of daftarModel) {
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.4,
+              responseMimeType: 'application/json'
+            }
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        lastError = data.error?.message || `Model ${model} sedang sibuk`;
+        continue; // Lanjut coba model berikutnya
       }
-    );
 
-    const data = await response.json();
+      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+      const hasilAnalisis = JSON.parse(rawText);
 
-    if (!response.ok) {
-      return res.status(500).json({ error: data.error?.message || 'Gagal menghubungi Gemini AI' });
+      return res.status(200).json(hasilAnalisis);
+    } catch (err) {
+      lastError = err.message;
+      continue;
     }
-
-    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-    const hasilAnalisis = JSON.parse(rawText);
-
-    return res.status(200).json(hasilAnalisis);
-  } catch (err) {
-    return res.status(500).json({ error: 'Terjadi kesalahan saat memproses AI: ' + err.message });
   }
+
+  return res.status(503).json({ error: lastError });
 }
