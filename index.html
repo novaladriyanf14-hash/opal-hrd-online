@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Opal HRD Online — Review CV ATS Gratis dari Mata HR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,700;8..60,900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <style>
+    :root {
+      --navy: #1D2D44;
+      --navy-2: #23344F;
+      --gold: #AF905B;
+      --gold-2: #917848;
+      --cream: #F7F3EB;
+      --cream-2: #FFFEFB;
+      --border: #E7EAF0;
+      --muted: #64748B;
+      --ink: #1E293B;
+      --sans: 'Inter', system-ui, sans-serif;
+      --serif: 'Source Serif 4', Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--cream);
+      font-family: var(--sans);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+    .topbar {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--navy);
+      letter-spacing: -0.02em;
+    }
+    .brand span { color: var(--gold); }
+    .badge-ai {
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: #fff;
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 999px;
+      color: var(--navy);
+    }
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 10px 20px 60px;
+    }
+    .hero {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-family: var(--serif);
+      font-size: clamp(1.9rem, 4.5vw, 2.8rem);
+      color: var(--navy);
+      line-height: 1.15;
+      margin: 0 0 12px;
+    }
+    .hero h1 em {
+      color: var(--gold);
+      font-style: italic;
+    }
+    .hero p {
+      color: var(--muted);
+      max-width: 580px;
+      margin: 0 auto;
+      font-size: 0.96rem;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(29, 45, 68, 0.05);
+      margin-bottom: 20px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 600px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    input[type="text"], select, textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--ink);
+      background: #FFFEFB;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+    .upload-box {
+      border: 2px dashed var(--gold);
+      background: #FFFBEB;
+      border-radius: 12px;
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 14px;
+      transition: background 0.2s;
+    }
+    .upload-box:hover { background: #FEF3C7; }
+    .btn-primary {
+      width: 100%;
+      background: var(--gold);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 15px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(175, 144, 91, 0.3);
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: var(--gold-2); }
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .result-box { display: none; }
+    .score-banner {
+      background: linear-gradient(145deg, var(--navy), var(--navy-2));
+      color: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+    .score-num {
+      font-family: var(--serif);
+      font-size: 3.2rem;
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .pill-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .pill {
+      background: rgba(255, 255, 255, 0.12);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .sec-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin: 0 0 10px;
+      border-left: 4px solid var(--gold);
+      padding-left: 10px;
+    }
+    .timeline-item {
+      background: #F8FAFC;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      font-size: 0.88rem;
+    }
+    .timeline-tag {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--gold-2);
+      display: block;
+      margin-bottom: 3px;
+    }
+    .rewrite-before {
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 0.86rem;
+      margin-bottom: 10px;
+    }
+    .rewrite-after {
+      background: #ECFDF5;
+      border: 1.5px solid #10B981;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+    .error-msg {
+      background: #FEE2E2;
+      color: #991B1B;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      margin-top: 12px;
+      display: none;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">OPAL <span>HRD ONLINE</span></div>
+  <div class="badge-ai">100% Gratis · Tanpa Login</div>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <h1>Lihat <em>6 Detik Pertama HRD</em><br>Saat Membaca CV Kamu.</h1>
+    <p>Unggah CV PDF atau tempel teks CV kamu. AI HRD kami akan mengevaluasi skor kecocokan ATS, blindspot, dan memperbaiki kalimat CV secara gratis.</p>
+  </section>
+
+  <section class="card">
+    <div class="grid-2">
+      <div>
+        <label for="targetRole">Posisi yang Dilamar</label>
+        <input type="text" id="targetRole" placeholder="Contoh: Electrical Engineer / Admin / Data Analyst">
+      </div>
+      <div>
+        <label for="statusKandidat">Status Kandidat</label>
+        <select id="statusKandidat">
+          <option value="Fresh Graduate">Fresh Graduate</option>
+          <option value="Mahasiswa Tingkat Akhir / Magang">Mahasiswa / Magang</option>
+          <option value="Berpengalaman (1-3 Tahun)">Berpengalaman (1–3 Tahun)</option>
+          <option value="Career Switcher">Pindah Jalur Karier (Career Switch)</option>
+        </select>
+      </div>
+    </div>
+
+    <label>Unggah CV (PDF) atau Tempel Teks CV di Bawah</label>
+    <div class="upload-box" onclick="document.getElementById('pdfInput').click()">
+      <strong style="color: var(--navy); font-size: 0.9rem;">📄 Klik untuk Pilih File CV (.PDF)</strong>
+      <div id="fileName" style="font-size: 0.76rem; color: var(--muted); margin-top: 4px;">Otomatis membaca teks dari file PDF kamu</div>
+      <input type="file" id="pdfInput" accept=".pdf" style="display:none">
+    </div>
+
+    <textarea id="cvText" rows="7" placeholder="Atau salin dan tempel seluruh isi teks CV kamu di sini..."></textarea>
+
+    <button id="analyzeBtn" class="btn-primary" style="margin-top: 16px;" onclick="mulaiAnalisis()">
+      Analisa CV Saya Sekarang (Gratis)
+    </button>
+    <div id="errorBox" class="error-msg"></div>
+  </section>
+
+  <section id="resultSection" class="result-box">
+    <div class="score-banner">
+      <div style="font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.85;">Skor Kelayakan ATS & HRD</div>
+      <div class="score-num"><span id="resSkor">0</span><span style="font-size: 1.3rem; color: #fff;">/100</span></div>
+      <div class="pill-row">
+        <span class="pill" id="resLevel">-</span>
+        <span class="pill" id="resPotensi">-</span>
+        <span class="pill" id="resTop">-</span>
+      </div>
+      <p id="resKesan" style="margin: 14px auto 0; max-width: 560px; font-size: 0.9rem; opacity: 0.95;"></p>
+    </div>
+
+    <div class="card">
+      <h3 class="sec-title">Simulasi Isi Kepala HRD (6 Detik Pertama)</h3>
+      <div class="timeline-item">
+        <span class="timeline-tag">Detik 0 – 2 · First Scan</span>
+        <span id="resDetik1"></span>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-tag">Detik 2 – 4 · Cek Pengalaman & Skill</span>
+        <span id="resDetik2"></span>
+      </div>
+      <div class="timeline-item" style="margin-bottom:0;">
+        <span class="timeline-tag">Detik 4 – 6 · Keputusan Awal</span>
+        <span id="resDetik3"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="sec-title">Blindspot Utama yang Harus Diperbaiki</h3>
+      <p id="resBlindspot" style="font-size: 0.9rem; margin: 0;"></p>
+    </div>
+
+    <div class="card">
+      <h3 class="sec-title">Contoh Perbaikan Kalimat CV (Before → After)</h3>
+      <div class="rewrite-before">
+        <div style="font-size: 0.7rem; font-weight: 800; color: #B91C1C; margin-bottom: 4px;">KALIMAT SAAT INI DI CV KAMU:</div>
+        <div id="resBefore"></div>
+      </div>
+      <div class="rewrite-after">
+        <div style="font-size: 0.7rem; font-weight: 800; color: #065F46; margin-bottom: 4px;">VERSI REKOMENDASI ATS & HRD:</div>
+        <div id="resAfter"></div>
+      </div>
+    </div>
+
+    <button class="btn-primary" style="background: var(--navy);" onclick="window.print()">
+      Simpan / Cetak Laporan ke PDF
+    </button>
+  </section>
+</main>
+
+<footer>
+  <strong>Opal HRD Online</strong> · Dibuat untuk membantu kandidat Indonesia lolos seleksi kerja secara gratis.
+</footer>
+
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  document.getElementById('pdfInput').addEventListener('change', async function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    document.getElementById('fileName').textContent = 'Membaca file: ' + file.name + '...';
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let fullText = '';
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const strings = content.items.map(item => item.str);
+        fullText += strings.join(' ') + '\n';
+      }
+
+      document.getElementById('cvText').value = fullText.trim();
+      document.getElementById('fileName').textContent = '✅ Berhasil dimuat: ' + file.name;
+    } catch (err) {
+      document.getElementById('fileName').textContent = '❌ Gagal membaca PDF. Silakan salin-tempel teks CV secara manual.';
+    }
+  });
+
+  async function mulaiAnalisis() {
+    const cvText = document.getElementById('cvText').value.trim();
+    const targetRole = document.getElementById('targetRole').value.trim();
+    const statusKandidat = document.getElementById('statusKandidat').value;
+    const btn = document.getElementById('analyzeBtn');
+    const errorBox = document.getElementById('errorBox');
+
+    errorBox.style.display = 'none';
+
+    if (cvText.length < 50) {
+      errorBox.textContent = 'Silakan unggah file CV PDF atau tempel teks CV minimal 50 karakter terlebih dahulu.';
+      errorBox.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ HRD AI sedang membaca & menganalisis CV kamu (±10 detik)...';
+
+    try {
+      const response = await fetch('/api/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cvText, targetRole, statusKandidat })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Terjadi kesalahan pada server.');
+      }
+
+      document.getElementById('resSkor').textContent = data.skor || 0;
+      document.getElementById('resLevel').textContent = data.level || '-';
+      document.getElementById('resPotensi').textContent = 'Potensi: ' + (data.potensi || '-');
+      document.getElementById('resTop').textContent = data.topPersen || '-';
+      document.getElementById('resKesan').textContent = data.ringkasanKesan || '';
+      document.getElementById('resDetik1').textContent = data.detik0_2 || '';
+      document.getElementById('resDetik2').textContent = data.detik2_4 || '';
+      document.getElementById('resDetik3').textContent = data.detik4_6 || '';
+      document.getElementById('resBlindspot').textContent = data.blindspot || '';
+      document.getElementById('resBefore').textContent = data.sebelumRewrite || '-';
+      document.getElementById('resAfter').textContent = data.sesudahRewrite || '-';
+
+      const resSec = document.getElementById('resultSection');
+      resSec.style.display = 'block';
+      resSec.scrollIntoView({ behavior: 'smooth' });
+    } catch (err) {
+      errorBox.textContent = 'Gagal memproses: ' + err.message;
+      errorBox.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Analisa CV Saya Sekarang (Gratis)';
+    }
+  }
+</script>
+</body>
+</html>
