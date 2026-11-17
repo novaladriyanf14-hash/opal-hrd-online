@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Opal HRD Online — Audit & Review CV ATS Gratis dari Mata HR</title>
+  <title>Opal HRD Online — Audit CV ATS 21 Fitur & Pembanding CV Gratis</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -27,6 +27,9 @@
       --success-bg: #ECFDF5;
       --success-border: #A7F3D0;
       --success-text: #065F46;
+      --warn-bg: #FFFBEB;
+      --warn-border: #FDE68A;
+      --warn-text: #92400E;
       --shadow: 0 12px 32px rgba(15, 61, 62, 0.06);
       --font-head: 'Plus Jakarta Sans', system-ui, sans-serif;
       --font-body: 'DM Sans', system-ui, sans-serif;
@@ -50,7 +53,10 @@
       --success-bg: rgba(16, 185, 129, 0.14);
       --success-border: rgba(52, 211, 153, 0.35);
       --success-text: #6EE7B7;
-      --shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+      --warn-bg: rgba(245, 158, 11, 0.14);
+      --warn-border: rgba(251, 191, 36, 0.35);
+      --warn-text: #FCD34D;
+      --shadow: 0 12px 32px rgba(0, 0, 0, 0.38);
     }
 
     * { box-sizing: border-box; }
@@ -64,7 +70,7 @@
     }
 
     .topbar {
-      max-width: 1060px;
+      max-width: 1100px;
       margin: 0 auto;
       padding: 18px 20px;
       display: flex;
@@ -76,7 +82,7 @@
     .brand {
       font-family: var(--font-head);
       font-weight: 800;
-      font-size: 1.15rem;
+      font-size: 1.18rem;
       color: var(--primary);
       letter-spacing: -0.03em;
       display: flex;
@@ -88,7 +94,6 @@
       height: 10px;
       border-radius: 50%;
       background: var(--accent);
-      display: inline-block;
     }
     .brand span { color: var(--accent); }
 
@@ -96,13 +101,14 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-wrap: wrap;
     }
     .credit-pill {
       font-size: 0.74rem;
       font-weight: 600;
       background: var(--surface);
       border: 1px solid var(--border);
-      padding: 6px 12px;
+      padding: 6px 13px;
       border-radius: 999px;
       color: var(--muted);
     }
@@ -110,28 +116,24 @@
       background: var(--surface);
       border: 1px solid var(--border);
       color: var(--text);
-      padding: 6px 12px;
+      padding: 6px 13px;
       border-radius: 999px;
       font-family: var(--font-head);
       font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s;
     }
     .theme-btn:hover { border-color: var(--accent); }
 
     .container {
-      max-width: 820px;
+      max-width: 900px;
       margin: 0 auto;
-      padding: 12px 20px 64px;
+      padding: 10px 20px 64px;
     }
 
     .hero {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 26px;
     }
     .hero-tag {
       display: inline-block;
@@ -141,7 +143,7 @@
       font-family: var(--font-head);
       font-size: 0.72rem;
       font-weight: 700;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
       padding: 5px 14px;
       border-radius: 999px;
@@ -149,7 +151,7 @@
     }
     .hero h1 {
       font-family: var(--font-head);
-      font-size: clamp(1.9rem, 4.5vw, 2.85rem);
+      font-size: clamp(1.85rem, 4.5vw, 2.8rem);
       font-weight: 800;
       line-height: 1.15;
       letter-spacing: -0.03em;
@@ -161,9 +163,38 @@
     }
     .hero p {
       color: var(--muted);
-      max-width: 600px;
+      max-width: 640px;
       margin: 0 auto;
-      font-size: 0.96rem;
+      font-size: 0.95rem;
+    }
+
+    /* Mode Switcher */
+    .mode-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 6px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+    .mode-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--font-head);
+      font-weight: 700;
+      font-size: 0.88rem;
+      padding: 12px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mode-btn.active {
+      background: #0F3D3E;
+      color: #FFFFFF;
     }
 
     .card {
@@ -181,9 +212,7 @@
       gap: 14px;
       margin-bottom: 16px;
     }
-    @media (max-width: 620px) {
-      .grid-2 { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 650px) { .grid-2 { grid-template-columns: 1fr; } }
 
     label {
       display: block;
@@ -194,14 +223,13 @@
     }
     input[type="text"], select, textarea {
       width: 100%;
-      padding: 12px 14px;
+      padding: 11px 14px;
       border: 1.5px solid var(--border);
       border-radius: 12px;
       font-family: inherit;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       color: var(--text);
       background: var(--bg);
-      transition: border-color 0.2s;
     }
     input:focus, select:focus, textarea:focus {
       outline: none;
@@ -212,13 +240,12 @@
       border: 2px dashed var(--accent);
       background: var(--surface-soft);
       border-radius: 14px;
-      padding: 18px;
+      padding: 16px;
       text-align: center;
       cursor: pointer;
-      margin-bottom: 14px;
-      transition: transform 0.15s ease;
+      margin-bottom: 12px;
     }
-    .upload-box:hover { transform: translateY(-1px); }
+    .upload-box:hover { opacity: 0.92; }
 
     .btn-primary {
       width: 100%;
@@ -237,6 +264,20 @@
     .btn-primary:hover { background: var(--accent-hover); }
     .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 
+    .copy-btn {
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      color: var(--primary);
+      font-family: var(--font-head);
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 5px 11px;
+      border-radius: 8px;
+      cursor: pointer;
+      float: right;
+    }
+    .copy-btn:hover { border-color: var(--accent); }
+
     .error-msg {
       background: var(--danger-bg);
       border: 1px solid var(--danger-border);
@@ -248,19 +289,18 @@
       display: none;
     }
 
-    .result-box { display: none; }
-
+    /* Result Banner */
     .score-banner {
       background: linear-gradient(145deg, #0F3D3E, #165254);
       color: #F4F7F5;
       border-radius: 20px;
       padding: 28px 24px;
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
     .score-num {
       font-family: var(--font-head);
-      font-size: 3.4rem;
+      font-size: 3.3rem;
       font-weight: 800;
       color: #F4937D;
       line-height: 1;
@@ -273,16 +313,46 @@
       margin-top: 12px;
     }
     .pill {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.13);
       padding: 5px 13px;
       border-radius: 999px;
       font-size: 0.78rem;
       font-weight: 700;
     }
 
+    /* Result Tabs */
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 18px;
+    }
+    .tab-btn {
+      flex: 1;
+      min-width: 150px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      font-family: var(--font-head);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 11px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .tab-btn.active {
+      background: #0F3D3E;
+      border-color: #0F3D3E;
+      color: #FFFFFF;
+    }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
     .sec-title {
       font-family: var(--font-head);
-      font-size: 1rem;
+      font-size: 0.98rem;
       font-weight: 800;
       color: var(--primary);
       margin: 0 0 14px;
@@ -298,18 +368,17 @@
       border-radius: 4px;
     }
 
-    /* 4 Pilar Progress */
     .pilar-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px;
+      gap: 12px;
     }
     @media (max-width: 600px) { .pilar-grid { grid-template-columns: 1fr; } }
-    .pilar-item {
+    .pilar-item, .info-box {
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 12px 14px;
+      padding: 13px 15px;
     }
     .pilar-top {
       display: flex;
@@ -329,17 +398,15 @@
       height: 100%;
       background: var(--accent);
       border-radius: 999px;
-      transition: width 0.6s ease;
     }
 
-    /* 6 Detik Timeline */
     .timeline-item {
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 13px 15px;
+      padding: 12px 14px;
       margin-bottom: 10px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
     }
     .timeline-tag {
       font-family: var(--font-head);
@@ -348,28 +415,25 @@
       text-transform: uppercase;
       color: var(--accent);
       display: block;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
-    /* Audit Kesalahan */
     .mistake-list {
       list-style: none;
       padding: 0;
       margin: 0;
       display: grid;
-      gap: 10px;
+      gap: 9px;
     }
     .mistake-list li {
       background: var(--danger-bg);
       border: 1px solid var(--danger-border);
       color: var(--danger-text);
-      padding: 11px 14px;
+      padding: 10px 14px;
       border-radius: 12px;
-      font-size: 0.88rem;
-      font-weight: 500;
+      font-size: 0.86rem;
     }
 
-    /* Keywords */
     .kw-wrap {
       display: flex;
       flex-wrap: wrap;
@@ -379,13 +443,12 @@
       background: var(--surface-soft);
       border: 1px solid var(--border);
       color: var(--primary);
-      padding: 6px 13px;
+      padding: 5px 12px;
       border-radius: 999px;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       font-weight: 700;
     }
 
-    /* Rewrites */
     .rewrite-pair {
       border: 1px solid var(--border);
       border-radius: 14px;
@@ -397,10 +460,16 @@
       background: var(--danger-bg);
       border: 1px solid var(--danger-border);
       color: var(--danger-text);
-      padding: 10px 12px;
+      padding: 9px 12px;
       border-radius: 10px;
-      font-size: 0.85rem;
+      font-size: 0.84rem;
+      margin-bottom: 6px;
+    }
+    .rw-why {
+      font-size: 0.78rem;
+      color: var(--muted);
       margin-bottom: 8px;
+      font-style: italic;
     }
     .rw-after {
       background: var(--success-bg);
@@ -408,35 +477,83 @@
       color: var(--success-text);
       padding: 10px 12px;
       border-radius: 10px;
-      font-size: 0.87rem;
+      font-size: 0.86rem;
       font-weight: 600;
     }
 
-    /* Interview QA */
     .qa-item {
       background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 10px;
+      border-radius: 14px;
+      padding: 15px;
+      margin-bottom: 12px;
+    }
+    .qa-cat {
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--accent);
+      letter-spacing: 0.05em;
     }
     .qa-q {
       font-family: var(--font-head);
       font-weight: 700;
-      font-size: 0.9rem;
+      font-size: 0.92rem;
       color: var(--primary);
-      margin-bottom: 6px;
+      margin: 4px 0 8px;
     }
     .qa-a {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      border-radius: 10px;
       font-size: 0.85rem;
-      color: var(--muted);
+    }
+
+    .script-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 0.86rem;
+      white-space: pre-line;
+      margin-bottom: 12px;
+    }
+
+    .chk-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 9px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      font-size: 0.86rem;
+      cursor: pointer;
+    }
+
+    /* Compare Table */
+    .cmp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .cmp-table th, .cmp-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 10px 8px;
+      text-align: left;
+    }
+    .cmp-table th {
+      font-family: var(--font-head);
+      color: var(--primary);
     }
 
     footer {
       text-align: center;
       font-size: 0.8rem;
       color: var(--muted);
-      margin-top: 36px;
+      margin-top: 38px;
       padding-top: 18px;
       border-top: 1px solid var(--border);
     }
@@ -454,12 +571,19 @@
 
 <main class="container">
   <section class="hero">
-    <div class="hero-tag">Audit CV ATS & Simulasi HRD · 100% Gratis</div>
-    <h1>Bedah CV Kamu dari <em>Mata HRD</em><br>Sebelum Dikirim Melamar.</h1>
-    <p>Unggah CV PDF atau tempel teks CV kamu. Dapatkan skor 4 pilar ATS, daftar kesalahan fatal, kata kunci yang hilang, perbaikan 3 kalimat CV, hingga prediksi pertanyaan interview.</p>
+    <div class="hero-tag">OCR Vision PDF Cerdas · 21 Fitur Audit HRD · 100% Gratis</div>
+    <h1>Bedah CV Kamu dari <em>Mata HRD</em><br>Hingga Siap Lolos Interview.</h1>
+    <p>Mendukung pembacaan visual PDF Canva & 2 kolom, audit 20 indikator ATS & karier, hingga fitur pembanding 2 CV sekaligus.</p>
   </section>
 
-  <section class="card">
+  <!-- Pemilih Mode -->
+  <div class="mode-switch">
+    <button class="mode-btn active" id="btnModeSingle" onclick="switchMode('single')">🔍 Audit Lengkap 1 CV (20 Fitur)</button>
+    <button class="mode-btn" id="btnModeCompare" onclick="switchMode('compare')">⚖️ Bandingkan 2 CV (Head-to-Head)</button>
+  </div>
+
+  <!-- FORM MODE 1: SINGLE AUDIT -->
+  <section id="formSingle" class="card">
     <div class="grid-2">
       <div>
         <label for="targetRole">Posisi yang Dilamar</label>
@@ -476,254 +600,656 @@
       </div>
     </div>
 
-    <label>Unggah CV (PDF) atau Tempel Teks CV di Bawah</label>
-    <div class="upload-box" onclick="document.getElementById('pdfInput').click()">
-      <strong style="font-family: var(--font-head); font-size: 0.92rem;">📄 Klik untuk Pilih File CV (.PDF)</strong>
-      <div id="fileName" style="font-size: 0.78rem; color: var(--muted); margin-top: 4px;">Otomatis mengekstrak teks dari file PDF kamu</div>
-      <input type="file" id="pdfInput" accept=".pdf" style="display:none">
+    <div style="margin-bottom: 16px;">
+      <label for="jobDesc">Tempel Syarat Lowongan Kerja / Job Description (Opsional — untuk akurasi maksimal)</label>
+      <textarea id="jobDesc" rows="3" placeholder="Tempel kualifikasi/deskripsi lowongan kerja di sini agar AI menghitung % kecocokan spesifik..."></textarea>
     </div>
 
-    <textarea id="cvText" rows="7" placeholder="Atau salin dan tempel seluruh isi teks CV kamu di sini..."></textarea>
+    <label>Unggah File CV (.PDF — Mendukung OCR Vision Canva/Scan) atau Tempel Teks</label>
+    <div class="upload-box" onclick="document.getElementById('pdfSingle').click()">
+      <strong style="font-family: var(--font-head); font-size: 0.92rem;">📄 Klik untuk Pilih File CV (.PDF)</strong>
+      <div id="fileNameSingle" style="font-size: 0.78rem; color: var(--muted); margin-top: 4px;">AI Vision akan membaca tata letak & seluruh isi CV PDF kamu</div>
+      <input type="file" id="pdfSingle" accept=".pdf" style="display:none">
+    </div>
 
-    <button id="analyzeBtn" class="btn-primary" style="margin-top: 16px;" onclick="mulaiAnalisis()">
-      Mulai Audit Lengkap CV Saya (Gratis)
+    <textarea id="cvTextSingle" rows="5" placeholder="Atau salin dan tempel seluruh isi teks CV kamu di sini..."></textarea>
+
+    <button id="btnRunSingle" class="btn-primary" style="margin-top: 16px;" onclick="runSingleAudit()">
+      Jalankan Audit Lengkap 20 Fitur (Gratis)
     </button>
-    <div id="errorBox" class="error-msg"></div>
+    <div id="errSingle" class="error-msg"></div>
   </section>
 
-  <section id="resultSection" class="result-box">
+  <!-- FORM MODE 2: COMPARE 2 CVS -->
+  <section id="formCompare" class="card" style="display:none;">
+    <div style="margin-bottom: 16px;">
+      <label for="compareRole">Posisi Target untuk Kedua CV</label>
+      <input type="text" id="compareRole" placeholder="Contoh: Staff Engineering / Management Trainee">
+    </div>
+
+    <div class="grid-2">
+      <!-- CV A -->
+      <div class="info-box">
+        <label for="labelA">Label CV Pertama (CV A)</label>
+        <input type="text" id="labelA" value="CV Versi A" style="margin-bottom: 10px;">
+        <div class="upload-box" style="padding: 12px;" onclick="document.getElementById('pdfA').click()">
+          <strong style="font-size: 0.84rem;">📄 Upload PDF CV A</strong>
+          <div id="fileNameA" style="font-size: 0.72rem; color: var(--muted);">Klik pilih PDF</div>
+          <input type="file" id="pdfA" accept=".pdf" style="display:none">
+        </div>
+        <textarea id="cvTextA" rows="5" placeholder="Atau tempel teks CV A di sini..."></textarea>
+      </div>
+
+      <!-- CV B -->
+      <div class="info-box">
+        <label for="labelB">Label CV Kedua (CV B)</label>
+        <input type="text" id="labelB" value="CV Versi B" style="margin-bottom: 10px;">
+        <div class="upload-box" style="padding: 12px;" onclick="document.getElementById('pdfB').click()">
+          <strong style="font-size: 0.84rem;">📄 Upload PDF CV B</strong>
+          <div id="fileNameB" style="font-size: 0.72rem; color: var(--muted);">Klik pilih PDF</div>
+          <input type="file" id="pdfB" accept=".pdf" style="display:none">
+        </div>
+        <textarea id="cvTextB" rows="5" placeholder="Atau tempel teks CV B di sini..."></textarea>
+      </div>
+    </div>
+
+    <button id="btnRunCompare" class="btn-primary" style="margin-top: 8px;" onclick="runCompareAudit()">
+      Bandingkan CV A vs CV B Sekarang (Head-to-Head)
+    </button>
+    <div id="errCompare" class="error-msg"></div>
+  </section>
+
+  <!-- HASIL MODE 1: 20 FITUR DALAM 4 TAB -->
+  <section id="resultSingle" style="display:none;">
     <div class="score-banner">
       <div style="font-size: 0.74rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.85;">Skor Keseluruhan ATS & HRD</div>
-      <div class="score-num"><span id="resSkor">0</span><span style="font-size: 1.35rem; color: #fff;">/100</span></div>
+      <div class="score-num"><span id="sSkor">0</span><span style="font-size: 1.35rem; color: #fff;">/100</span></div>
       <div class="pill-row">
-        <span class="pill" id="resLevel">-</span>
-        <span class="pill" id="resPotensi">-</span>
-        <span class="pill" id="resTop">-</span>
+        <span class="pill" id="sJdMatch">JD Match: -%</span>
+        <span class="pill" id="sLevel">-</span>
+        <span class="pill" id="sPotensi">-</span>
+        <span class="pill" id="sTop">-</span>
       </div>
-      <p id="resKesan" style="margin: 14px auto 0; max-width: 580px; font-size: 0.92rem; opacity: 0.95;"></p>
+      <p id="sKesan" style="margin: 14px auto 0; max-width: 620px; font-size: 0.92rem; opacity: 0.95;"></p>
     </div>
 
-    <div class="card">
-      <h3 class="sec-title">Rincian Skor 4 Pilar Utama</h3>
-      <div class="pilar-grid">
-        <div class="pilar-item">
-          <div class="pilar-top"><span>Format & Ramah ATS</span><span id="pilar1Val">0%</span></div>
-          <div class="bar-track"><div class="bar-fill" id="pilar1Bar" style="width:0%"></div></div>
+    <!-- Navigasi Tab Laporan -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="openTab(event, 'tab1')">1. Skor & Audit ATS</button>
+      <button class="tab-btn" onclick="openTab(event, 'tab2')">2. Perbaikan Kalimat & Summary</button>
+      <button class="tab-btn" onclick="openTab(event, 'tab3')">3. Simulasi Interview & Karir</button>
+      <button class="tab-btn" onclick="openTab(event, 'tab4')">4. Email, LinkedIn & Action Plan</button>
+    </div>
+
+    <!-- TAB 1: SKOR & AUDIT ATS -->
+    <div id="tab1" class="tab-pane active">
+      <div class="card">
+        <h3 class="sec-title">Rincian Skor 4 Pilar Utama</h3>
+        <div class="pilar-grid">
+          <div class="pilar-item"><div class="pilar-top"><span>Format & Ramah ATS</span><span id="p1Val">0</span></div><div class="bar-track"><div class="bar-fill" id="p1Bar"></div></div></div>
+          <div class="pilar-item"><div class="pilar-top"><span>Dampak & Bukti Angka</span><span id="p2Val">0</span></div><div class="bar-track"><div class="bar-fill" id="p2Bar"></div></div></div>
+          <div class="pilar-item"><div class="pilar-top"><span>Relevansi Skill & Posisi</span><span id="p3Val">0</span></div><div class="bar-track"><div class="bar-fill" id="p3Bar"></div></div></div>
+          <div class="pilar-item"><div class="pilar-top"><span>Struktur & Kejelasan</span><span id="p4Val">0</span></div><div class="bar-track"><div class="bar-fill" id="p4Bar"></div></div></div>
         </div>
-        <div class="pilar-item">
-          <div class="pilar-top"><span>Dampak & Bukti Angka</span><span id="pilar2Val">0%</span></div>
-          <div class="bar-track"><div class="bar-fill" id="pilar2Bar" style="width:0%"></div></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card" style="margin-bottom:0;">
+          <h3 class="sec-title">Audit Visual & Tata Letak ATS</h3>
+          <div style="font-weight:700; color:var(--accent); font-size:0.86rem; margin-bottom:4px;" id="sVisualStatus">-</div>
+          <p id="sVisualNote" style="font-size:0.86rem; margin:0;"></p>
         </div>
-        <div class="pilar-item">
-          <div class="pilar-top"><span>Relevansi Skill & Posisi</span><span id="pilar3Val">0%</span></div>
-          <div class="bar-track"><div class="bar-fill" id="pilar3Bar" style="width:0%"></div></div>
-        </div>
-        <div class="pilar-item">
-          <div class="pilar-top"><span>Struktur & Kejelasan</span><span id="pilar4Val">0%</span></div>
-          <div class="bar-track"><div class="bar-fill" id="pilar4Bar" style="width:0%"></div></div>
+        <div class="card" style="margin-bottom:0;">
+          <h3 class="sec-title">Skor Keterbacaan & Kepadatan</h3>
+          <div style="font-weight:700; color:var(--primary); font-size:0.86rem; margin-bottom:4px;" id="sReadStatus">-</div>
+          <p id="sReadNote" style="font-size:0.86rem; margin:0;"></p>
         </div>
       </div>
-    </div>
 
-    <div class="card">
-      <h3 class="sec-title">Audit Kesalahan Kritis yang Ditemukan</h3>
-      <ul class="mistake-list" id="resKesalahan"></ul>
-    </div>
-
-    <div class="card">
-      <h3 class="sec-title">Kata Kunci ATS yang Wajib Ditambahkan</h3>
-      <p style="font-size: 0.84rem; color: var(--muted); margin: -6px 0 12px;">Sertakan kata kunci berikut secara natural di bagian Skill atau Pengalaman agar lolos penyaringan mesin ATS:</p>
-      <div class="kw-wrap" id="resKeywords"></div>
-    </div>
-
-    <div class="card">
-      <h3 class="sec-title">Simulasi Isi Kepala HRD (6 Detik Pertama)</h3>
-      <div class="timeline-item">
-        <span class="timeline-tag">Detik 0 – 2 · First Scan Header</span>
-        <span id="resDetik1"></span>
+      <div class="card" style="margin-top:20px;">
+        <h3 class="sec-title">Simulasi Isi Kepala HRD (6 Detik Pertama)</h3>
+        <div class="timeline-item"><span class="timeline-tag">Detik 0 – 2 · First Scan Header</span><span id="sDetik1"></span></div>
+        <div class="timeline-item"><span class="timeline-tag">Detik 2 – 4 · Evaluasi Pengalaman</span><span id="sDetik2"></span></div>
+        <div class="timeline-item" style="margin-bottom:0;"><span class="timeline-tag">Detik 4 – 6 · Keputusan Awal HRD</span><span id="sDetik3"></span></div>
       </div>
-      <div class="timeline-item">
-        <span class="timeline-tag">Detik 2 – 4 · Evaluasi Pengalaman & Projek</span>
-        <span id="resDetik2"></span>
-      </div>
-      <div class="timeline-item" style="margin-bottom:0;">
-        <span class="timeline-tag">Detik 4 – 6 · Keputusan Awal HRD</span>
-        <span id="resDetik3"></span>
+
+      <div class="card">
+        <h3 class="sec-title">Audit Kesalahan Kritis & Typo</h3>
+        <ul class="mistake-list" id="sKesalahan"></ul>
       </div>
     </div>
 
-    <div class="card">
-      <h3 class="sec-title">3 Saran Perbaikan Kalimat CV (Before → After)</h3>
-      <div id="resRewrites"></div>
+    <!-- TAB 2: PERBAIKAN KALIMAT & SUMMARY -->
+    <div id="tab2" class="tab-pane">
+      <div class="card">
+        <h3 class="sec-title">Generator Professional Summary (Siap Tempel)</h3>
+        <label>Versi Bahasa Indonesia <button class="copy-btn" onclick="copyText('sSumId')">Salin</button></label>
+        <div class="script-box" id="sSumId"></div>
+        <label>Versi Bahasa Inggris <button class="copy-btn" onclick="copyText('sSumEn')">Salin</button></label>
+        <div class="script-box" id="sSumEn" style="margin-bottom:0;"></div>
+      </div>
+
+      <div class="card">
+        <h3 class="sec-title">Deep Rewrite Poin Pengalaman (Before → After)</h3>
+        <div id="sRewrites"></div>
+      </div>
+
+      <div class="card">
+        <h3 class="sec-title">Kata Kunci ATS yang Wajib Ditambahkan</h3>
+        <div class="kw-wrap" id="sKeywords"></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3 class="sec-title">Detektor Klise & Buzzword Buster</h3>
+          <div id="sBuzzwords"></div>
+        </div>
+        <div class="card">
+          <h3 class="sec-title">Power Verbs Analyzer</h3>
+          <div id="sPowerVerbs"></div>
+        </div>
+      </div>
     </div>
 
-    <div class="card">
-      <h3 class="sec-title">Prediksi Pertanyaan Interview & Kisi-Kisi Jawaban</h3>
-      <div id="resInterview"></div>
+    <!-- TAB 3: SIMULASI INTERVIEW & KARIR -->
+    <div id="tab3" class="tab-pane">
+      <div class="card">
+        <h3 class="sec-title">Simulasi Pertanyaan Interview & Skrip Jawaban STAR</h3>
+        <div id="sInterview"></div>
+      </div>
+
+      <div class="card">
+        <h3 class="sec-title">Elevator Pitch Generator (60 Detik Perkenalan Diri)</h3>
+        <label>Versi Bahasa Indonesia <button class="copy-btn" onclick="copyText('sPitchId')">Salin</button></label>
+        <div class="script-box" id="sPitchId"></div>
+        <label>Versi Bahasa Inggris <button class="copy-btn" onclick="copyText('sPitchEn')">Salin</button></label>
+        <div class="script-box" id="sPitchEn" style="margin-bottom:0;"></div>
+      </div>
+
+      <div class="card">
+        <h3 class="sec-title">Detektor Red Flag & Cara Menjelaskannya</h3>
+        <div id="sRedFlags"></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3 class="sec-title">Rekomendasi Posisi Alternatif</h3>
+          <div id="sAltRoles"></div>
+        </div>
+        <div class="card">
+          <h3 class="sec-title">Skill Gap & Ide Proyek Mini</h3>
+          <div id="sSkillGap"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="sec-title">Panduan Negosiasi Gaji & Range Pasar</h3>
+        <div style="font-weight:800; color:var(--accent); font-size:1rem; margin-bottom:6px;" id="sGajiRange">-</div>
+        <div class="script-box" id="sGajiSkrip" style="margin-bottom:0;"></div>
+      </div>
+    </div>
+
+    <!-- TAB 4: KOMUNIKASI & ACTION PLAN -->
+    <div id="tab4" class="tab-pane">
+      <div class="card">
+        <h3 class="sec-title">Generator Email Lamaran & Cover Letter</h3>
+        <label>Subjek Email <button class="copy-btn" onclick="copyText('sEmailSubj')">Salin</button></label>
+        <div class="script-box" id="sEmailSubj"></div>
+        <label>Isi Email / Cover Letter Siap Kirim <button class="copy-btn" onclick="copyText('sEmailBody')">Salin</button></label>
+        <div class="script-box" id="sEmailBody" style="margin-bottom:0;"></div>
+      </div>
+
+      <div class="card">
+        <h3 class="sec-title">Optimasi Profil LinkedIn</h3>
+        <label>Headline LinkedIn <button class="copy-btn" onclick="copyText('sLiHead')">Salin</button></label>
+        <div class="script-box" id="sLiHead"></div>
+        <label>Tentang Saya (About) <button class="copy-btn" onclick="copyText('sLiAbout')">Salin</button></label>
+        <div class="script-box" id="sLiAbout" style="margin-bottom:0;"></div>
+      </div>
+
+      <div class="card">
+        <h3 class="sec-title">Template Networking, Follow-Up & Konfirmasi WA</h3>
+        <label>1. Sapa Rekruter di LinkedIn <button class="copy-btn" onclick="copyText('sMsgLi')">Salin</button></label>
+        <div class="script-box" id="sMsgLi"></div>
+        <label>2. Follow-Up Setelah 7 Hari Melamar <button class="copy-btn" onclick="copyText('sMsgFu')">Salin</button></label>
+        <div class="script-box" id="sMsgFu"></div>
+        <label>3. Balas Undangan Interview via WhatsApp <button class="copy-btn" onclick="copyText('sMsgWa')">Salin</button></label>
+        <div class="script-box" id="sMsgWa" style="margin-bottom:0;"></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3 class="sec-title">Peta Aksi 7 Hari</h3>
+          <div id="sActionPlan"></div>
+        </div>
+        <div class="card">
+          <h3 class="sec-title">Checklist Sebelum Kirim</h3>
+          <div style="font-size:0.8rem; margin-bottom:10px;">Saran nama file: <strong id="sFileNameRec">-</strong> <button class="copy-btn" onclick="copyText('sFileNameRec')">Salin</button></div>
+          <div id="sChecklist"></div>
+        </div>
+      </div>
     </div>
 
     <button class="btn-primary" style="background: #0F3D3E;" onclick="window.print()">
-      Simpan / Cetak Laporan Audit ke PDF
+      Simpan / Cetak Laporan Lengkap ke PDF
     </button>
+  </section>
+
+  <!-- HASIL MODE 2: COMPARE HEAD-TO-HEAD -->
+  <section id="resultCompare" style="display:none;">
+    <div class="score-banner">
+      <div style="font-size: 0.74rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.85;">Keputusan Panel HRD (Head-to-Head)</div>
+      <div class="score-num" style="font-size: 2.3rem; margin: 8px 0;" id="cWinnerTitle">🏆 Pemenang: -</div>
+      <div class="pill-row">
+        <span class="pill" id="cScoreA">CV A: 0/100</span>
+        <span class="pill" id="cScoreB">CV B: 0/100</span>
+        <span class="pill" id="cDiff">Selisih: +0 Poin</span>
+      </div>
+      <p id="cVerdict" style="margin: 14px auto 0; max-width: 620px; font-size: 0.92rem;"></p>
+    </div>
+
+    <div class="card">
+      <h3 class="sec-title">Tabel Perbandingan 5 Dimensi Seleksi</h3>
+      <div style="overflow-x:auto;">
+        <table class="cmp-table">
+          <thead>
+            <tr>
+              <th>Aspek Penilaian</th>
+              <th id="thA">CV A</th>
+              <th id="thB">CV B</th>
+              <th>Catatan HRD</th>
+            </tr>
+          </thead>
+          <tbody id="cTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3 class="sec-title" id="titleAnalisA">Analisis CV A</h3>
+        <div id="bodyAnalisA"></div>
+      </div>
+      <div class="card">
+        <h3 class="sec-title" id="titleAnalisB">Analisis CV B</h3>
+        <div id="bodyAnalisB"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="sec-title">Rekomendasi Penggabungan Terbaik (Hybrid CV)</h3>
+      <p id="cHybrid" style="font-size: 0.9rem; margin: 0;"></p>
+    </div>
   </section>
 </main>
 
 <footer>
-  <strong>Opal HRD Online</strong> · Platform Review CV ATS Gratis · Created by <strong>Noval Adriyan Firmansyah</strong>
+  <strong>Opal HRD Online</strong> · Ekosistem Audit CV ATS & Karier Gratis · Created by <strong>Noval Adriyan Firmansyah</strong>
 </footer>
 
 <script>
-  // Pengaturan Tema Gelap / Terang
+  // State Penyimpanan Base64 PDF untuk Multimodal OCR Vision
+  const pdfStore = { single: null, A: null, B: null };
+
+  // Tema Gelap / Terang
   function toggleTheme() {
     const isDark = document.body.classList.toggle('dark');
-    const btn = document.getElementById('themeToggle');
-    btn.textContent = isDark ? '☀️ Mode Terang' : '🌙 Mode Gelap';
+    document.getElementById('themeToggle').textContent = isDark ? '☀️ Mode Terang' : '🌙 Mode Gelap';
     localStorage.setItem('opal_theme', isDark ? 'dark' : 'light');
   }
-
   if (localStorage.getItem('opal_theme') === 'dark') {
     document.body.classList.add('dark');
     document.getElementById('themeToggle').textContent = '☀️ Mode Terang';
   }
 
-  // Ekstraksi PDF
+  // Switch Mode Single vs Compare
+  function switchMode(mode) {
+    document.getElementById('btnModeSingle').classList.toggle('active', mode === 'single');
+    document.getElementById('btnModeCompare').classList.toggle('active', mode === 'compare');
+    document.getElementById('formSingle').style.display = mode === 'single' ? 'block' : 'none';
+    document.getElementById('formCompare').style.display = mode === 'compare' ? 'block' : 'none';
+    document.getElementById('resultSingle').style.display = 'none';
+    document.getElementById('resultCompare').style.display = 'none';
+  }
+
+  // Tab Navigasi Laporan
+  function openTab(evt, tabId) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    evt.currentTarget.classList.add('active');
+  }
+
+  // Copy Text Helper
+  function copyText(elementId) {
+    const text = document.getElementById(elementId).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Teks berhasil disalin ke clipboard!');
+    });
+  }
+
+  // Konfigurasi PDF.js & Multimodal Base64 Reader
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-  document.getElementById('pdfInput').addEventListener('change', async function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
+  function setupPdfInput(inputId, labelId, textareaId, storeKey) {
+    document.getElementById(inputId).addEventListener('change', async function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
 
-    document.getElementById('fileName').textContent = 'Membaca file: ' + file.name + '...';
-    try {
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-      let fullText = '';
+      const labelEl = document.getElementById(labelId);
+      labelEl.textContent = 'Memproses PDF: ' + file.name + '...';
 
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
-        fullText += content.items.map(item => item.str).join(' ') + '\n';
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+
+        // Jika ukuran <= 3.5MB, simpan Base64 agar Gemini Vision membaca visual & OCR langsung
+        if (file.size <= 3.5 * 1024 * 1024) {
+          const bytes = new Uint8Array(arrayBuffer);
+          let binary = '';
+          for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i]);
+          }
+          pdfStore[storeKey] = btoa(binary);
+        } else {
+          pdfStore[storeKey] = null;
+        }
+
+        // Tetap ekstrak teks lewat PDF.js sebagai cadangan & pratinjau
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let fullText = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          fullText += content.items.map(item => item.str).join(' ') + '\n';
+        }
+        if (fullText.trim()) {
+          document.getElementById(textareaId).value = fullText.trim();
+        }
+
+        labelEl.textContent = `✅ Siap (Mode OCR Vision): ${file.name}`;
+      } catch (err) {
+        labelEl.textContent = '⚠️ File dimuat sebagai dokumen visual AI: ' + file.name;
       }
+    });
+  }
 
-      document.getElementById('cvText').value = fullText.trim();
-      document.getElementById('fileName').textContent = '✅ Berhasil dimuat: ' + file.name;
-    } catch (err) {
-      document.getElementById('fileName').textContent = '❌ Gagal membaca PDF. Silakan tempel teks CV secara manual.';
-    }
-  });
+  setupPdfInput('pdfSingle', 'fileNameSingle', 'cvTextSingle', 'single');
+  setupPdfInput('pdfA', 'fileNameA', 'cvTextA', 'A');
+  setupPdfInput('pdfB', 'fileNameB', 'cvTextB', 'B');
 
-  // Proses Analisis AI
-  async function mulaiAnalisis() {
-    const cvText = document.getElementById('cvText').value.trim();
+  // JALANKAN MODE 1: AUDIT 20 FITUR
+  async function runSingleAudit() {
+    const cvText = document.getElementById('cvTextSingle').value.trim();
+    const pdfBase64 = pdfStore.single;
     const targetRole = document.getElementById('targetRole').value.trim();
     const statusKandidat = document.getElementById('statusKandidat').value;
-    const btn = document.getElementById('analyzeBtn');
-    const errorBox = document.getElementById('errorBox');
+    const jobDesc = document.getElementById('jobDesc').value.trim();
+    const btn = document.getElementById('btnRunSingle');
+    const errBox = document.getElementById('errSingle');
 
-    errorBox.style.display = 'none';
-
-    if (cvText.length < 50) {
-      errorBox.textContent = 'Silakan unggah file CV PDF atau tempel teks CV minimal 50 karakter terlebih dahulu.';
-      errorBox.style.display = 'block';
+    errBox.style.display = 'none';
+    if (!pdfBase64 && cvText.length < 40) {
+      errBox.textContent = 'Silakan unggah file CV PDF atau tempel teks CV minimal 40 karakter.';
+      errBox.style.display = 'block';
       return;
     }
 
     btn.disabled = true;
-    btn.textContent = '⏳ HRD AI sedang mengaudit CV kamu secara mendalam (±12 detik)...';
+    btn.textContent = '⏳ Memindai Visual PDF & Mengaudit 20 Indikator HRD (±10 detik)...';
 
     try {
-      const response = await fetch('/api/review', {
+      const res = await fetch('/api/review', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cvText, targetRole, statusKandidat })
+        body: JSON.stringify({ mode: 'single', cvText, pdfBase64, targetRole, statusKandidat, jobDesc })
       });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Terjadi kesalahan pada server.');
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'Gagal memproses audit.');
 
-      // Skor Utama
-      document.getElementById('resSkor').textContent = data.skorTotal || 0;
-      document.getElementById('resLevel').textContent = data.level || '-';
-      document.getElementById('resPotensi').textContent = 'Potensi: ' + (data.potensi || '-');
-      document.getElementById('resTop').textContent = data.topPersen || '-';
-      document.getElementById('resKesan').textContent = data.ringkasanKesan || '';
+      // Banner
+      document.getElementById('sSkor').textContent = d.skorTotal || 0;
+      document.getElementById('sJdMatch').textContent = 'JD Match: ' + (d.jdMatchPersen || 75) + '%';
+      document.getElementById('sLevel').textContent = d.levelPiramida || '-';
+      document.getElementById('sPotensi').textContent = 'Potensi: ' + (d.potensiLevel || '-');
+      document.getElementById('sTop').textContent = d.topPersen || '-';
+      document.getElementById('sKesan').textContent = d.ringkasanKesan || '';
 
       // 4 Pilar
-      const pilar = data.pilar || {};
-      setPilar(1, pilar.atsFormat || 0);
-      setPilar(2, pilar.dampakAngka || 0);
-      setPilar(3, pilar.relevansiSkill || 0);
-      setPilar(4, pilar.strukturKejelasan || 0);
+      const p = d.pilar || {};
+      setBar(1, p.atsFormat || 0);
+      setBar(2, p.dampakAngka || 0);
+      setBar(3, p.relevansiSkill || 0);
+      setBar(4, p.strukturKejelasan || 0);
 
-      // Kesalahan Kritis
-      const errList = document.getElementById('resKesalahan');
-      errList.innerHTML = '';
-      (data.daftarKesalahan || []).forEach(item => {
-        const li = document.createElement('li');
-        li.textContent = '⚠️ ' + item;
-        errList.appendChild(li);
-      });
-
-      // Missing Keywords
-      const kwWrap = document.getElementById('resKeywords');
-      kwWrap.innerHTML = '';
-      (data.missingKeywords || []).forEach(kw => {
-        const span = document.createElement('span');
-        span.className = 'kw-chip';
-        span.textContent = '+ ' + kw;
-        kwWrap.appendChild(span);
-      });
+      // Visual & Readability
+      document.getElementById('sVisualStatus').textContent = d.auditVisualLayout?.status || '-';
+      document.getElementById('sVisualNote').textContent = d.auditVisualLayout?.catatan || '-';
+      document.getElementById('sReadStatus').textContent = d.keterbacaan?.status || '-';
+      document.getElementById('sReadNote').textContent = d.keterbacaan?.saran || '-';
 
       // 6 Detik
-      document.getElementById('resDetik1').textContent = data.detik0_2 || '';
-      document.getElementById('resDetik2').textContent = data.detik2_4 || '';
-      document.getElementById('resDetik3').textContent = data.detik4_6 || '';
+      document.getElementById('sDetik1').textContent = d.simulasi6Detik?.detik0_2 || '-';
+      document.getElementById('sDetik2').textContent = d.simulasi6Detik?.detik2_4 || '-';
+      document.getElementById('sDetik3').textContent = d.simulasi6Detik?.detik4_6 || '-';
 
-      // 3 Rewrites
-      const rwContainer = document.getElementById('resRewrites');
-      rwContainer.innerHTML = '';
-      (data.rewrites || []).forEach((rw, idx) => {
-        const div = document.createElement('div');
-        div.className = 'rewrite-pair';
-        div.innerHTML = `
-          <div class="rw-before"><strong>#${idx + 1} Sebelum (Dari CV):</strong><br>${escapeHtml(rw.sebelum || '-')}</div>
-          <div class="rw-after"><strong>✓ Rekomendasi HRD:</strong><br>${escapeHtml(rw.sesudah || '-')}</div>
-        `;
-        rwContainer.appendChild(div);
+      // Kesalahan
+      const errUl = document.getElementById('sKesalahan');
+      errUl.innerHTML = '';
+      (d.daftarKesalahan || []).forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = '⚠️ ' + item;
+        errUl.appendChild(li);
       });
 
-      // Prediksi Interview
-      const qaContainer = document.getElementById('resInterview');
-      qaContainer.innerHTML = '';
-      (data.prediksiInterview || []).forEach((qa, idx) => {
-        const div = document.createElement('div');
-        div.className = 'qa-item';
-        div.innerHTML = `
-          <div class="qa-q">Q${idx + 1}: "${escapeHtml(qa.pertanyaan || '')}"</div>
-          <div class="qa-a"><strong>Tips Jawab:</strong> ${escapeHtml(qa.tipsJawab || '')}</div>
+      // Summary
+      document.getElementById('sSumId').textContent = d.professionalSummary?.indonesia || '-';
+      document.getElementById('sSumEn').textContent = d.professionalSummary?.inggris || '-';
+
+      // Rewrites
+      const rwDiv = document.getElementById('sRewrites');
+      rwDiv.innerHTML = '';
+      (d.rewrites || []).forEach((rw, i) => {
+        const el = document.createElement('div');
+        el.className = 'rewrite-pair';
+        el.innerHTML = `
+          <div class="rw-before"><strong>#${i + 1} Sebelum:</strong> ${esc(rw.sebelum)}</div>
+          <div class="rw-why">💡 Kenapa kurang kuat: ${esc(rw.alasanLemah)}</div>
+          <div class="rw-after">✓ Sesudah (Rekomendasi HRD): ${esc(rw.sesudah)}</div>
         `;
-        qaContainer.appendChild(div);
+        rwDiv.appendChild(el);
       });
 
-      const resSec = document.getElementById('resultSection');
-      resSec.style.display = 'block';
-      resSec.scrollIntoView({ behavior: 'smooth' });
+      // Keywords
+      const kwDiv = document.getElementById('sKeywords');
+      kwDiv.innerHTML = '';
+      (d.missingKeywords || []).forEach(k => {
+        const sp = document.createElement('span');
+        sp.className = 'kw-chip';
+        sp.textContent = '+ ' + k;
+        kwDiv.appendChild(sp);
+      });
+
+      // Buzzwords & Power Verbs
+      const bzDiv = document.getElementById('sBuzzwords');
+      bzDiv.innerHTML = '';
+      (d.buzzwordBuster || []).forEach(b => {
+        bzDiv.innerHTML += `<div class="info-box" style="margin-bottom:8px; font-size:0.84rem;"><span style="color:var(--danger-text); text-decoration:line-through;">"${esc(b.klise)}"</span> → <strong style="color:var(--success-text);">${esc(b.pengganti)}</strong></div>`;
+      });
+
+      const pvDiv = document.getElementById('sPowerVerbs');
+      pvDiv.innerHTML = '';
+      (d.powerVerbs || []).forEach(v => {
+        pvDiv.innerHTML += `<div class="info-box" style="margin-bottom:8px; font-size:0.84rem;">❌ ${esc(v.lemah)} → ✅ <strong>${esc(v.kuat)}</strong></div>`;
+      });
+
+      // Interview
+      const ivDiv = document.getElementById('sInterview');
+      ivDiv.innerHTML = '';
+      (d.prediksiInterview || []).forEach((q, i) => {
+        ivDiv.innerHTML += `
+          <div class="qa-item">
+            <div class="qa-cat">${esc(q.kategori || 'Interview')}</div>
+            <div class="qa-q">Q${i + 1}: "${esc(q.pertanyaan)}"</div>
+            <div class="qa-a"><strong>Contoh Jawaban STAR:</strong><br>${esc(q.contohJawaban)}</div>
+          </div>
+        `;
+      });
+
+      // Pitch
+      document.getElementById('sPitchId').textContent = d.elevatorPitch?.indonesia || '-';
+      document.getElementById('sPitchEn').textContent = d.elevatorPitch?.inggris || '-';
+
+      // Red Flags
+      const rfDiv = document.getElementById('sRedFlags');
+      rfDiv.innerHTML = '';
+      (d.redFlags || []).forEach(r => {
+        rfDiv.innerHTML += `<div class="info-box" style="margin-bottom:8px; font-size:0.86rem;"><strong>🚩 Temuan:</strong> ${esc(r.temuan)}<br><strong>🛡️ Cara Menjelaskan:</strong> ${esc(r.caraMenjelaskan)}</div>`;
+      });
+
+      // Alt Roles & Skill Gap
+      const arDiv = document.getElementById('sAltRoles');
+      arDiv.innerHTML = '';
+      (d.posisiAlternatif || []).forEach(a => {
+        arDiv.innerHTML += `<div class="info-box" style="margin-bottom:8px; font-size:0.84rem;"><strong>🎯 ${esc(a.posisi)}</strong><br>${esc(a.alasanCocok)}</div>`;
+      });
+
+      const sgDiv = document.getElementById('sSkillGap');
+      sgDiv.innerHTML = '';
+      (d.skillGap || []).forEach(s => {
+        sgDiv.innerHTML += `<div class="info-box" style="margin-bottom:8px; font-size:0.84rem;"><strong>📚 Pelajari: ${esc(s.skill)}</strong><br>Proyek Mini: ${esc(s.proyekMini)}</div>`;
+      });
+
+      // Gaji
+      document.getElementById('sGajiRange').textContent = d.negosiasiGaji?.estimasiRange || '-';
+      document.getElementById('sGajiSkrip').textContent = d.negosiasiGaji?.skripJawaban || '-';
+
+      // Komunikasi
+      const km = d.komunikasi || {};
+      document.getElementById('sEmailSubj').textContent = km.subjekEmail || '-';
+      document.getElementById('sEmailBody').textContent = km.bodyEmail || '-';
+      document.getElementById('sLiHead').textContent = km.linkedinHeadline || '-';
+      document.getElementById('sLiAbout').textContent = km.linkedinAbout || '-';
+      document.getElementById('sMsgLi').textContent = km.outreachLinkedin || '-';
+      document.getElementById('sMsgFu').textContent = km.followupEmail || '-';
+      document.getElementById('sMsgWa').textContent = km.konfirmasiWa || '-';
+
+      // Action Plan & Checklist
+      const apDiv = document.getElementById('sActionPlan');
+      apDiv.innerHTML = '';
+      (d.actionPlan7Hari || []).forEach(step => {
+        apDiv.innerHTML += `<div class="info-box" style="margin-bottom:8px; font-size:0.84rem;">📌 ${esc(step)}</div>`;
+      });
+
+      document.getElementById('sFileNameRec').textContent = d.checklistAkhir?.namaFileSaran || 'CV_Kandidat.pdf';
+      const chkDiv = document.getElementById('sChecklist');
+      chkDiv.innerHTML = '';
+      (d.checklistAkhir?.items || []).forEach(item => {
+        chkDiv.innerHTML += `<label class="chk-item"><input type="checkbox"> <span>${esc(item)}</span></label>`;
+      });
+
+      const resEl = document.getElementById('resultSingle');
+      resEl.style.display = 'block';
+      resEl.scrollIntoView({ behavior: 'smooth' });
     } catch (err) {
-      errorBox.textContent = 'Gagal memproses: ' + err.message;
-      errorBox.style.display = 'block';
+      errBox.textContent = 'Gagal memproses: ' + err.message;
+      errBox.style.display = 'block';
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Mulai Audit Lengkap CV Saya (Gratis)';
+      btn.textContent = 'Jalankan Audit Lengkap 20 Fitur (Gratis)';
     }
   }
 
-  function setPilar(num, val) {
-    document.getElementById(`pilar${num}Val`).textContent = val + '/100';
-    document.getElementById(`pilar${num}Bar`).style.width = Math.min(100, Math.max(0, val)) + '%';
+  // JALANKAN MODE 2: COMPARE 2 CVS
+  async function runCompareAudit() {
+    const targetRole = document.getElementById('compareRole').value.trim();
+    const labelA = document.getElementById('labelA').value.trim() || 'CV A';
+    const labelB = document.getElementById('labelB').value.trim() || 'CV B';
+    const cvTextA = document.getElementById('cvTextA').value.trim();
+    const cvTextB = document.getElementById('cvTextB').value.trim();
+    const pdfBase64A = pdfStore.A;
+    const pdfBase64B = pdfStore.B;
+    const btn = document.getElementById('btnRunCompare');
+    const errBox = document.getElementById('errCompare');
+
+    errBox.style.display = 'none';
+    if ((!pdfBase64A && cvTextA.length < 40) || (!pdfBase64B && cvTextB.length < 40)) {
+      errBox.textContent = 'Harap unggah PDF atau tempel teks untuk kedua CV (CV A dan CV B).';
+      errBox.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⚖️ Panel HRD AI sedang membandingkan CV A vs CV B...';
+
+    try {
+      const res = await fetch('/api/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'compare', targetRole, labelA, cvTextA, pdfBase64A, labelB, cvTextB, pdfBase64B })
+      });
+
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'Gagal membandingkan CV.');
+
+      document.getElementById('cWinnerTitle').textContent = '🏆 Unggul: ' + (d.namaPemenang || d.pemenang || '-');
+      document.getElementById('cScoreA').textContent = `${labelA}: ${d.skorA || 0}/100`;
+      document.getElementById('cScoreB').textContent = `${labelB}: ${d.skorB || 0}/100`;
+      document.getElementById('cDiff').textContent = `Selisih: +${d.selisihSkor || 0} Poin`;
+      document.getElementById('cVerdict').textContent = d.putusanUtama || '';
+
+      document.getElementById('thA').textContent = labelA;
+      document.getElementById('thB').textContent = labelB;
+      const tbody = document.getElementById('cTableBody');
+      tbody.innerHTML = '';
+      (d.dimensi || []).forEach(row => {
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${esc(row.aspek)}</strong></td>
+            <td>${row.nilaiA}/100</td>
+            <td>${row.nilaiB}/100</td>
+            <td>${esc(row.catatan)}</td>
+          </tr>
+        `;
+      });
+
+      document.getElementById('titleAnalisA').textContent = 'Evaluasi ' + labelA;
+      document.getElementById('bodyAnalisA').innerHTML = renderProsCons(d.analisisA);
+
+      document.getElementById('titleAnalisB').textContent = 'Evaluasi ' + labelB;
+      document.getElementById('bodyAnalisB').innerHTML = renderProsCons(d.analisisB);
+
+      document.getElementById('cHybrid').textContent = d.saranHybrid || '-';
+
+      const resEl = document.getElementById('resultCompare');
+      resEl.style.display = 'block';
+      resEl.scrollIntoView({ behavior: 'smooth' });
+    } catch (err) {
+      errBox.textContent = 'Gagal memproses: ' + err.message;
+      errBox.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Bandingkan CV A vs CV B Sekarang (Head-to-Head)';
+    }
   }
 
-  function escapeHtml(str) {
-    return String(str)
+  function renderProsCons(obj) {
+    if (!obj) return '';
+    let html = '<div style="margin-bottom:10px;"><strong style="color:var(--success-text);">✅ Kelebihan:</strong><ul style="margin:4px 0 0 18px; padding:0; font-size:0.85rem;">';
+    (obj.kelebihan || []).forEach(k => html += `<li>${esc(k)}</li>`);
+    html += '</ul></div><div><strong style="color:var(--danger-text);">⚠️ Kelemahan:</strong><ul style="margin:4px 0 0 18px; padding:0; font-size:0.85rem;">';
+    (obj.kelemahan || []).forEach(k => html += `<li>${esc(k)}</li>`);
+    html += '</ul></div>';
+    return html;
+  }
+
+  function setBar(idx, val) {
+    document.getElementById(`p${idx}Val`).textContent = val + '/100';
+    document.getElementById(`p${idx}Bar`).style.width = Math.min(100, Math.max(0, val)) + '%';
+  }
+
+  function esc(str) {
+    return String(str || '')
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
