@@ -23,11 +23,12 @@ export default async function handler(req, res) {
       return await handleCommsTab(req.body, apiKeys, res);
     } else if (mode === 'compare') {
       return await handleCompareMode(req.body, apiKeys, res);
+    } else if (mode === 'custom_rewrite') {
+      return await handleCustomRewrite(req.body, apiKeys, res);
     } else {
       return res.status(400).json({ error: 'Mode analisis tidak dikenali.' });
     }
   } catch (err) {
-    // Jika semua API Key habis kuota hariannya, aktifkan cadangan lokal agar web tidak pernah error
     if (mode === 'core') {
       return res.status(200).json(fallbackCoreAudit(req.body));
     } else if (mode === 'career') {
@@ -36,6 +37,8 @@ export default async function handler(req, res) {
       return res.status(200).json(fallbackCommsTab(req.body));
     } else if (mode === 'compare') {
       return res.status(200).json(fallbackCompareMode(req.body));
+    } else if (mode === 'custom_rewrite') {
+      return res.status(200).json(fallbackCustomRewrite(req.body));
     }
     return res.status(500).json({ error: err.message });
   }
@@ -53,7 +56,7 @@ async function callGeminiFast(parts, apiKeys) {
   for (const key of apiKeys) {
     for (const model of models) {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 8500);
+      const timer = setTimeout(() => controller.abort(), 9000);
 
       try {
         const response = await fetch(
@@ -65,8 +68,8 @@ async function callGeminiFast(parts, apiKeys) {
             body: JSON.stringify({
               contents: [{ parts }],
               generationConfig: {
-                temperature: 0.3,
-                maxOutputTokens: 2800,
+                temperature: 0.35,
+                maxOutputTokens: 3400,
                 responseMimeType: 'application/json'
               }
             })
@@ -105,21 +108,21 @@ function buildVisualParts(images, cvText, prompt) {
     });
   }
   if (cvText && cvText.trim().length > 0) {
-    parts.push({ text: `Teks CV:\n"""\n${cvText.slice(0, 8500)}\n"""` });
+    parts.push({ text: `Teks CV:\n"""\n${cvText.slice(0, 9000)}\n"""` });
   }
   parts.push({ text: prompt });
   return parts;
 }
 
-// TAHAP 1: AUDIT INTI (TAB 1 & TAB 2)
+// TAHAP 1: AUDIT INTI + 6 DEEP REWRITES OTOMATIS
 async function handleCoreAudit(body, apiKeys, res) {
   const { cvText, images, targetRole, statusKandidat, jobDesc } = body;
 
-  const prompt = `Kamu adalah Senior HRD Indonesia. Baca visual gambar CV (jika ada) & teks yang dilampirkan. Audit secara ringkas, tajam, dan spesifik.
+  const prompt = `Kamu adalah Senior HRD Indonesia. Baca visual gambar CV (jika ada) & teks yang dilampirkan. Audit secara tajam dan spesifik.
 Posisi Target: ${targetRole || 'Sesuaikan isi CV'} | Status: ${statusKandidat || 'Fresh Graduate'}
 Job Desc: ${jobDesc ? jobDesc.slice(0, 1500) : 'Standar industri Indonesia'}
 
-Keluarkan HANYA JSON valid sesuai struktur persis ini:
+Keluarkan HANYA JSON valid sesuai struktur persis ini (wajib berikan 6 poin rewrites dari berbagai bagian CV: magang, kerja, proyek, atau organisasi):
 {
   "skorTotal": 78,
   "jdMatchPersen": 75,
@@ -156,14 +159,43 @@ Keluarkan HANYA JSON valid sesuai struktur persis ini:
     "inggris": "3-sentence Professional Summary in English tailored to this candidate."
   },
   "rewrites": [
-    { "sebelum": "Kutipan kalimat asli 1 dari CV", "alasanLemah": "Kenapa kurang kuat", "sesudah": "Perbaikan dengan Action Verb + Angka" },
-    { "sebelum": "Kutipan kalimat asli 2 dari CV", "alasanLemah": "Kenapa kurang kuat", "sesudah": "Perbaikan kalimat 2" },
-    { "sebelum": "Kutipan kalimat asli 3 dari CV", "alasanLemah": "Kenapa kurang kuat", "sesudah": "Perbaikan kalimat 3" }
+    { "bagian": "Pengalaman / Magang", "sebelum": "Kutipan asli 1 dari CV", "alasanLemah": "Kenapa kurang kuat", "sesudah": "Perbaikan dengan Action Verb + Angka" },
+    { "bagian": "Pengalaman / Magang", "sebelum": "Kutipan asli 2 dari CV", "alasanLemah": "Kenapa kurang kuat", "sesudah": "Perbaikan kalimat 2" },
+    { "bagian": "Proyek / Tugas Akhir", "sebelum": "Kutipan asli 3 dari CV", "alasanLemah": "Kenapa kurang kuat", "sesudah": "Perbaikan kalimat 3" },
+    { "bagian": "Proyek / Praktikum", "sebelum": "Kutipan asli 4 dari CV", "alasanLemah": "Kenapa kurang kuat", "sesudah": "Perbaikan kalimat 4" },
+    { "bagian": "Organisasi / Kepanitiaan", "sebelum": "Kutipan asli 5 dari CV", "alasanLemah": "Kenapa kurang kuat", "sesudah": "Perbaikan kalimat 5" },
+    { "bagian": "Keahlian / Pencapaian", "sebelum": "Kutipan asli 6 dari CV", "alasanLemah": "Kenapa kurang kuat", "sesudah": "Perbaikan kalimat 6" }
   ]
 }`;
 
   const parts = buildVisualParts(images, cvText, prompt);
   const data = await callGeminiFast(parts, apiKeys);
+  return res.status(200).json(data);
+}
+
+// FITUR BARU (OPSI 2): CUSTOM REWRITE KALIMAT INTERAKTIF
+async function handleCustomRewrite(body, apiKeys, res) {
+  const { rawSentence, targetRole, language = 'Indonesia' } = body;
+
+  if (!rawSentence || rawSentence.trim().length < 8) {
+    return res.status(400).json({ error: 'Masukkan kalimat yang ingin diperbaiki terlebih dahulu.' });
+  }
+
+  const prompt = `Kamu adalah Senior HRD & CV Writer profesional. Tulis ulang kalimat/poin pengalaman CV berikut agar jauh lebih menjual, ramah ATS, menggunakan kata kerja aktif (Action Verbs), dan berorientasi dampak/metrik.
+
+Kalimat Asli Kandidat:
+"${rawSentence.slice(0, 1500)}"
+Posisi Target: ${targetRole || 'Umum'}
+Bahasa Output: ${language}
+
+Keluarkan HANYA JSON valid:
+{
+  "versiStandar": "Versi perbaikan rapi & profesional menggunakan rumus Action Verb + Tugas + Dampak (${language}).",
+  "versiEksekutif": "Versi kedua yang lebih tajam dengan penekanan angka/metrik pencapaian (${language}).",
+  "catatanHrd": "1 kalimat penjelasan singkat bagian mana yang ditingkatkan."
+}`;
+
+  const data = await callGeminiFast([{ text: prompt }], apiKeys);
   return res.status(200).json(data);
 }
 
@@ -284,7 +316,7 @@ Keluarkan HANYA JSON valid:
 }
 
 // =========================================================================
-// FALLBACK LOKAL ANTI-ERROR JIKA KUOTA HARIAN SELURUH API KEY PENUH
+// FALLBACK LOKAL ANTI-ERROR
 // =========================================================================
 function fallbackCoreAudit(body) {
   const cv = body.cvText || '';
@@ -293,7 +325,7 @@ function fallbackCoreAudit(body) {
   const hasAngka = /\d+%|\d+\s*(orang|tim|proyek|project|unit|bulan|tahun|juta)/i.test(cv);
   const skor = hasAngka ? 79 : 71;
 
-  const kalimat = cv.split(/[\n•\-]/).map(s => s.trim()).filter(s => s.length > 25 && s.length < 130);
+  const kalimat = cv.split(/[\n•\-]/).map(s => s.trim()).filter(s => s.length > 22 && s.length < 140);
 
   return {
     skorTotal: skor,
@@ -336,21 +368,58 @@ function fallbackCoreAudit(body) {
     },
     rewrites: [
       {
+        bagian: 'Pengalaman / Magang',
         sebelum: kalimat[0] || 'Bertanggung jawab membantu kegiatan operasional dan administrasi harian.',
         alasanLemah: 'Terlalu pasif dan tidak menunjukkan skala kontribusi.',
         sesudah: `Mengoptimalkan alur kerja operasional harian dan memastikan 100% dokumen proyek selesai tepat waktu.`
       },
       {
+        bagian: 'Pengalaman / Magang',
         sebelum: kalimat[1] || 'Mengikuti pelaksanaan proyek bersama tim di lapangan.',
         alasanLemah: 'Kata "mengikuti" terkesan hanya sebagai pengamat.',
         sesudah: `Berkontribusi aktif dalam eksekusi proyek ${role} bersama tim, meningkatkan efisiensi penyelesaian tugas hingga 20%.`
       },
       {
-        sebelum: kalimat[2] || 'Membuat laporan kegiatan secara berkala.',
-        alasanLemah: 'Belum menjelaskan manfaat laporan bagi tim.',
-        sesudah: `Menyusun laporan evaluasi kinerja mingguan yang menjadi acuan percepatan pengambilan keputusan tim.`
+        bagian: 'Proyek / Tugas Akhir',
+        sebelum: kalimat[2] || 'Merancang dan menguji sistem sesuai spesifikasi tugas.',
+        alasanLemah: 'Belum menonjolkan tingkat akurasi atau keberhasilan pengujian.',
+        sesudah: `Merancang, mengintegrasikan, dan menguji prototipe sistem hingga mencapai tingkat akurasi pengujian di atas 95%.`
+      },
+      {
+        bagian: 'Proyek / Praktikum',
+        sebelum: kalimat[3] || 'Membuat laporan kegiatan dan analisis hasil praktikum.',
+        alasanLemah: 'Belum menjelaskan manfaat analisis bagi pengambilan keputusan.',
+        sesudah: `Menganalisis data teknis dan menyusun laporan evaluasi komprehensif sebagai dasar rekomendasi perbaikan sistem.`
+      },
+      {
+        bagian: 'Organisasi / Kepanitiaan',
+        sebelum: kalimat[4] || 'Menjadi panitia acara dan membantu koordinasi peserta.',
+        alasanLemah: 'Skala peserta dan peran koordinasi belum terukur.',
+        sesudah: `Mengoordinasikan logistik dan alur acara untuk 150+ peserta dengan tingkat kelancaran jadwal 100%.`
+      },
+      {
+        bagian: 'Keahlian / Sertifikasi',
+        sebelum: kalimat[5] || 'Menguasai penggunaan software pendukung teknik dan perkantoran.',
+        alasanLemah: 'Terlalu umum dan kurang spesifik untuk pemindaian kata kunci ATS.',
+        sesudah: `Mengoperasikan perangkat lunak teknis standar industri untuk pemodelan, dokumentasi, dan pelaporan data secara akurat.`
       }
     ]
+  };
+}
+
+function fallbackCustomRewrite(body) {
+  const raw = (body.rawSentence || '').trim();
+  const isEn = body.language === 'Inggris';
+  return {
+    versiStandar: isEn
+      ? `Executed and optimized operational tasks related to "${raw}", ensuring 100% compliance with project timelines and quality standards.`
+      : `Mengeksekusi dan mengoptimalkan tugas terkait "${raw}", memastikan seluruh target selesai tepat waktu sesuai standar kualitas.`,
+    versiEksekutif: isEn
+      ? `Streamlined key workflows by delivering "${raw}", improving overall team execution efficiency by 20% through structured coordination.`
+      : `Meningkatkan efisiensi alur kerja tim hingga 20% melalui eksekusi terstruktur pada "${raw}" dan kolaborasi lintas fungsi.`,
+    catatanHrd: isEn
+      ? 'Replaced passive phrasing with strong action verbs and measurable outcome indicators.'
+      : 'Mengganti struktur kalimat pasif dengan kata kerja aktif (Action Verbs) serta menambahkan indikator hasil terukur.'
   };
 }
 
