@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Opal HRD Online — OCR Vision CV Audit & Pembanding CV Gratis</title>
+  <title>Opal HRD Online — Audit CV ATS 22 Fitur & Pembanding CV Gratis</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -290,6 +290,7 @@
     .kw-chip { background: var(--surface-soft); border: 1px solid var(--border); color: var(--primary); padding: 5px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; }
 
     .rewrite-pair { border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 12px; background: var(--bg); }
+    .rw-badge { display: inline-block; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: var(--primary); background: var(--surface-soft); padding: 2px 9px; border-radius: 999px; margin-bottom: 7px; }
     .rw-before { background: var(--danger-bg); border: 1px solid var(--danger-border); color: var(--danger-text); padding: 9px 12px; border-radius: 10px; font-size: 0.84rem; margin-bottom: 6px; }
     .rw-why { font-size: 0.78rem; color: var(--muted); margin-bottom: 8px; font-style: italic; }
     .rw-after { background: var(--success-bg); border: 1px solid var(--success-border); color: var(--success-text); padding: 10px 12px; border-radius: 10px; font-size: 0.86rem; font-weight: 600; }
@@ -322,13 +323,13 @@
 
 <main class="container">
   <section class="hero">
-    <div class="hero-tag">Smart OCR PDF · 21 Fitur Audit HRD · 100% Gratis · Cukup Doakan Saja Agar Rezeki Noval Lancar😃</div>
+    <div class="hero-tag">Smart OCR PDF · 22 Fitur Audit HRD · 100% Gratis Cukup Doakan Saja Agar Rezeki Noval Lancar😃</div>
     <h1>Bedah CV Kamu dari <em>Mata HRD</em><br>Hingga Siap Lolos Interview.</h1>
-    <p>Mendukung pembacaan teks & OCR PDF Canva/scan secara cerdas, dilengkapi 20 indikator audit karier & fitur pembanding 2 CV sekaligus.</p>
+    <p>Mendukung pembacaan teks & OCR PDF Canva/scan secara cerdas, dilengkapi 21 indikator audit karier & fitur pembanding 2 CV sekaligus.</p>
   </section>
 
   <div class="mode-switch">
-    <button class="mode-btn active" id="btnModeSingle" onclick="switchMode('single')">🔍 Audit Lengkap 1 CV (20 Fitur)</button>
+    <button class="mode-btn active" id="btnModeSingle" onclick="switchMode('single')">🔍 Audit Lengkap 1 CV (21 Fitur)</button>
     <button class="mode-btn" id="btnModeCompare" onclick="switchMode('compare')">⚖️ Bandingkan 2 CV (Head-to-Head)</button>
   </div>
 
@@ -476,9 +477,33 @@
         <div class="script-box" id="sSumEn" style="margin-bottom:0;"></div>
       </div>
 
+      <!-- OPSI 1: 6 DEEP REWRITES OTOMATIS -->
       <div class="card">
-        <h3 class="sec-title">Deep Rewrite Poin Pengalaman (Before → After)</h3>
+        <h3 class="sec-title">6 Deep Rewrite Poin Pengalaman & Proyek (Before → After)</h3>
         <div id="sRewrites"></div>
+      </div>
+
+      <!-- OPSI 2: ALAT BEDAH KALIMAT KUSTOM INTERAKTIF -->
+      <div class="card" style="border: 1.5px solid var(--accent);">
+        <h3 class="sec-title">Alat Bedah Kalimat Kustom (Tulis Ulang Poin Mana Pun)</h3>
+        <p style="font-size: 0.84rem; color: var(--muted); margin: -6px 0 12px;">Masih ada poin lain di CV yang ingin diperbaiki? Tempel kalimat aslinya di bawah ini untuk ditulis ulang dengan standar HRD:</p>
+        <textarea id="customSentenceInput" rows="3" placeholder="Contoh: Bertanggung jawab membantu pengecekan panel listrik dan membuat laporan harian..."></textarea>
+        <div class="grid-2" style="margin-top: 10px; margin-bottom: 10px;">
+          <select id="customSentenceLang">
+            <option value="Indonesia">Hasil dalam Bahasa Indonesia</option>
+            <option value="Inggris">Hasil dalam Bahasa Inggris (English)</option>
+          </select>
+          <button id="btnCustomRewrite" class="btn-primary" style="padding: 11px; font-size: 0.9rem;" onclick="runCustomRewrite()">
+            ✨ Tulis Ulang Kalimat Ini
+          </button>
+        </div>
+        <div id="customRewriteResult" style="display:none; margin-top: 12px;">
+          <div style="font-size: 0.8rem; color: var(--muted); font-style: italic; margin-bottom: 8px;" id="crNote"></div>
+          <label>Opsi 1 · Standar Profesional <button class="copy-btn" onclick="copyText('crOpt1')">Salin</button></label>
+          <div class="rw-after" id="crOpt1" style="margin-bottom: 10px;"></div>
+          <label>Opsi 2 · Berorientasi Metrik & Dampak <button class="copy-btn" onclick="copyText('crOpt2')">Salin</button></label>
+          <div class="rw-after" id="crOpt2"></div>
+        </div>
       </div>
 
       <div class="card">
@@ -663,7 +688,6 @@
     });
   }
 
-  // SMART PDF EXTRACTOR: Kirim gambar OCR hanya jika teks PDF kosong/sedikit (hemat kuota & super cepat)
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
   function setupPdfSnapshot(inputId, labelId, textareaId, storeKey) {
@@ -688,7 +712,6 @@
         const cleanText = fullText.trim();
         document.getElementById(textareaId).value = cleanText;
 
-        // Jika teks PDF kurang dari 150 karakter (misal PDF hasil scan/gambar Canva), render JPEG OCR
         if (cleanText.length < 150) {
           const snapshots = [];
           const maxPages = Math.min(pdf.numPages, 2);
@@ -797,14 +820,18 @@
       document.getElementById('sSumId').textContent = d.professionalSummary?.indonesia || '-';
       document.getElementById('sSumEn').textContent = d.professionalSummary?.inggris || '-';
 
+      // Render 6 Deep Rewrites Otomatis
       const rwDiv = document.getElementById('sRewrites');
       rwDiv.innerHTML = '';
       (d.rewrites || []).forEach((rw, i) => {
+        const rwId = `rwAuto_${i}`;
         rwDiv.innerHTML += `
           <div class="rewrite-pair">
+            <span class="rw-badge">${esc(rw.bagian || 'Poin CV')}</span>
+            <button class="copy-btn" onclick="copyText('${rwId}')">Salin Hasil</button>
             <div class="rw-before"><strong>#${i + 1} Sebelum:</strong> ${esc(rw.sebelum)}</div>
             <div class="rw-why">💡 Kenapa kurang kuat: ${esc(rw.alasanLemah)}</div>
-            <div class="rw-after">✓ Sesudah (Rekomendasi HRD): ${esc(rw.sesudah)}</div>
+            <div class="rw-after">✓ Sesudah: <span id="${rwId}">${esc(rw.sesudah)}</span></div>
           </div>
         `;
       });
@@ -840,6 +867,35 @@
     } finally {
       btn.disabled = false;
       btn.textContent = 'Analisa CV Sekarang (±2 Detik)';
+    }
+  }
+
+  // OPSI 2: ALAT BEDAH KALIMAT KUSTOM
+  async function runCustomRewrite() {
+    const rawSentence = document.getElementById('customSentenceInput').value.trim();
+    const language = document.getElementById('customSentenceLang').value;
+    const targetRole = document.getElementById('targetRole').value.trim();
+    const btn = document.getElementById('btnCustomRewrite');
+
+    if (rawSentence.length < 8) {
+      alert('Silakan ketik atau tempel kalimat yang ingin diperbaiki terlebih dahulu.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Menulis ulang...';
+
+    try {
+      const d = await postJsonSafe({ mode: 'custom_rewrite', rawSentence, targetRole, language });
+      document.getElementById('crNote').textContent = '💡 ' + (d.catatanHrd || '');
+      document.getElementById('crOpt1').textContent = d.versiStandar || '-';
+      document.getElementById('crOpt2').textContent = d.versiEksekutif || '-';
+      document.getElementById('customRewriteResult').style.display = 'block';
+    } catch (err) {
+      alert('Gagal menulis ulang: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '✨ Tulis Ulang Kalimat Ini';
     }
   }
 
